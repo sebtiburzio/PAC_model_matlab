@@ -108,32 +108,3 @@ end
 
 %%
 Pi = pinv(Y)*delta
-
-%%
-% k from static eqns with variable gravity field
-p_vals = [0.6, 0.23, 0.61, 0.02]';
-range = [6:18];%[1,length(Gamma)];
-num_samples = range(2) - range(1) + 1;
-Gamma_set = Gamma(range(1):range(2));
-Theta_set = [Theta0(range(1):range(2))'; Theta1(range(1):range(2))'];
-K_known = 1e-1*[1, 1/2; 1/2, 1/3];
-G_scale = 1.0;
-clear delta Y
-
-for sample = 1:num_samples
-
-    %   RHS = -G(Theta,Gamma) -K*Theta
-    RHS = -G_scale*Gv_fcn(p_vals,Theta_set(:,sample),Gamma_set(sample)) -K_known*Theta_set(:,sample);
-    Y_n = -K_known*Theta_set(sample);  
-    
-    if sample == 1
-        delta = RHS;
-        Y = Y_n;
-    else
-        delta = [delta; RHS];
-        Y = [Y; Y_n];
-    end
-
-end
-
-Pi = pinv(Y)*delta

@@ -5,20 +5,20 @@ addpath('automatically_generated/fixed')
 %%
 % Object properties
 global p_vals G_dir
-p_vals = [0.4, 0.23, 0.75, 0.015];
+p_vals = [0.6, 0.23, 0.61, 0.02];
 G_dir = 0;
 
-k_obj = 0.0206;
-beta_obj = 7.0e-2;
+k_obj = 0.01;
+beta_obj = 0.0505;
 
 global K Theta_bar D
 global G_Scale BC_Scale
 G_Scale = 1.0;
-BC_Scale = 1.8;
+BC_Scale = 1.6886;
 
 H = [1, 1/2; 1/2, 1/3];
 K = k_obj*H;
-Theta_bar = [-3;-1];
+Theta_bar = [-0.5;3];
 D = beta_obj*H;
 
 % Put initial condition here
@@ -31,10 +31,10 @@ q_ev = out.q_ev; % or if sim doesn't finish: q_ev = load('q_ev.mat');
 %plot_robot(q_ev)
 
 %% Plot Theta evolution
-% plot(ts,Theta0)
+plot(ts,Theta0)
 hold on
 plot(q_ev.Time,q_ev.Data(:,1))
-% plot(ts,Theta1)
+plot(ts,Theta1)
 plot(q_ev.Time,q_ev.Data(:,2))
 hold off
 
@@ -57,4 +57,4 @@ stop_time = q_ev.time(end);
 time_vect = linspace(0,stop_time,n_step);
 q_ev_res = resample(q_ev,time_vect);
 data = [time_vect', q_ev_res.Data(:,1), q_ev_res.Data(:,2)];
-writematrix(data,'black_swing_sim_newMdef_k1_b04_BC18_off_n50_300.csv');
+writematrix(data,'black_swing_sim_k078_b0455_BC16536_off_n745_562.csv');

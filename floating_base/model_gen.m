@@ -40,6 +40,8 @@ rot_alpha = [cos(subs(alpha,v,s)) sin(subs(alpha,v,s));
             -sin(subs(alpha,v,s)) cos(subs(alpha,v,s))]; 
 fk_fcn = [x; z] + rot_phi*(fk_fcn + D*rot_alpha*[0; d]);
 
+fka_fcn = [fk_fcn; subs(alpha,v,s)];
+
 toc
 
 % Export FK function
@@ -51,6 +53,18 @@ fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
 fid  = fopen('automatically_generated/fk_fcn.m','w');
+fprintf(fid,'%s',f);
+fclose(fid);
+
+% With orientation
+matlabFunction(fka_fcn,'File','automatically_generated/fka_fcn','Vars',{p, q, s, d}); % creating the MatLab function
+
+fid  = fopen('automatically_generated/fka_fcn.m','r');
+f=fread(fid,'*char')';
+fclose(fid);
+f = strrep(f,'fresnelc','fresnelc_approx');
+f = strrep(f,'fresnels','fresnels_approx');
+fid  = fopen('automatically_generated/fka_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 

@@ -16,21 +16,25 @@ ub = [Inf, Inf, 0.855, 1.19, pi/4];
 
 %%
 % Position only
-goal = [0.5; 0.3];
+goal = [0.5; 0.2];
 q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
 
 %%
 % Position and orientation
-goal = [0.8; 0.3; pi/2];
+goal = [0.2; 0.2; pi/2];
 q_st = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon)
 
 %%
 %Line
 q_0 = [1e-3; 1e-3; 0.0; 0.0; 0.0];
+curv = [];
+path = [];
 for i = 0:9
-    goal = [0.1+0.09*i; 0.1];
-%     goal = [0.4; 0.1+0.07*i];
-    q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
+    % goal = [0.2+0.07*i; 0.333];
+    goal = [0.4; 0.1+0.07*i];
+    q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+    path = [path, [q_st(3); q_st(4); q_st(5)]];
+    curv = [curv, [q_st(1); q_st(2)]];
     q_0 = q_st;
     plot_config(q_st,i/10+0.1)
     hold on
@@ -40,10 +44,14 @@ hold off
 %%
 %Circle
 q_0 = [1e-3; 1e-3; 0.0; 0.0; 0.0];
+curv = [];
+path = [];
 for i = 0:pi/6:2*pi
-    goal = [0.5+0.1*cos(i); 0.6-0.1*sin(i)];
+    goal = [0.4+0.2*cos(i); 0.333-0.2*sin(i)];
     q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
     q_0 = q_st;
+    path = [path, [q_st(3); q_st(4); q_st(5)]];
+    curv = [curv, [q_st(1); q_st(2)]];
     plot_config(q_st,i/6.5+0.03)
     hold on
 end

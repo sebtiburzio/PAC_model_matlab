@@ -8,7 +8,7 @@ global p_vals G_dir
 p_vals = [0.4, 0.23, 0.75, 0.015];
 G_dir = 0;
 
-k_obj = 0.0005;
+k_obj = 0.0006;
 beta_obj = 0.0505;
 
 global K Theta_bar D
@@ -18,7 +18,7 @@ BC_Scale = 1.6886;
 
 H = [1, 1/2; 1/2, 1/3];
 K = k_obj*H;
-Theta_bar = [10;100];
+Theta_bar = [139.8899; 52.9564];
 D = beta_obj*H;
 
 % Put initial condition here
@@ -39,7 +39,9 @@ plot(q_ev.Time,q_ev.Data(:,2))
 hold off
 
 %% Plot steady state comparison
-for i = 3:3:21 % 1 = -165deg, 23 = 165 deg. 6 = -90deg, 12 = 0deg, 18 = 90deg
+%ss_range = 3:3:21; % for 23 pt data. 1 = -165deg, 23 = 165 deg. 6 = -90deg, 12 = 0deg, 18 = 90deg
+ss_range = [1 57 121 178 228];
+for i = ss_range
     G_dir = -Gamma(i); % Note- use -ve Gamma since since data is robot angle
     out = sim('dynamics');
     q_ev = out.q_ev;

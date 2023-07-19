@@ -2,8 +2,8 @@ clear
 addpath('automatically_generated/fixed')
 
 %%
-p_vals = [0.4, 0.23, 0.75, 0.02];
-range = [9,15];
+p_vals = [0.4, 0.23, 0.75, 0.015];
+range = [1,228];
 num_samples = range(2) - range(1) + 1;
 Gamma_set = -Gamma(range(1):range(2)); % Note - use -ve Gamma since data is robot angle
 Theta_set = [Theta0(range(1):range(2))'; Theta1(range(1):range(2))'];

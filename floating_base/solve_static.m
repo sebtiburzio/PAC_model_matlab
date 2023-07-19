@@ -4,35 +4,50 @@ addpath('automatically_generated')
 
 %%
 global p_vals k Theta_bar
-p_vals = [0.6, 0.23, 0.61, 0.02]';
+p_vals = [0.4, 0.23, 0.75, 0.015]';
 k = 0.01;
 Theta_bar = [-0.5,3];
+Pi = [k Theta_bar];
 
 global goal
-q_0 = [1e-3; 1e-3; 0.0; 0.0; 0.0];
+q_0 = [1e-3; 1e-3; 0.1; 0.9; 0.0];
 
-lb = [-Inf,-Inf, -0.4, 0.333, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 0.855, 1.19, pi/4];
+lb = [-Inf,-Inf, -0.4, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 0.4, 0.9, 2*pi/4];
+global radial_constraint
+radial_constraint = 0.85;
 
 %%
 % Position only
-goal = [0.5; 0.2];
-q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
+goal = [0.2; 0.14];
+[q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
+goals = goal;
+results = exitflag;
+path = [q_st(3); q_st(4); q_st(5)];
+curv = [q_st(1); q_st(2)];
 
 %%
 % Position and orientation
 goal = [0.2; 0.2; pi/2];
-q_st = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon)
+[q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon)
+goals = goal;
+results = exitflag;
+path = [q_st(3); q_st(4); q_st(5)];
+curv = [q_st(1); q_st(2)];
 
 %%
 %Line
 q_0 = [1e-3; 1e-3; 0.0; 0.0; 0.0];
+goals = [];
 curv = [];
 path = [];
+results = [];
 for i = 0:9
     % goal = [0.2+0.07*i; 0.333];
     goal = [0.4; 0.1+0.07*i];
-    q_st = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+    goals = [goal, goals];
+    [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+    results = [results exitflag];
     path = [path, [q_st(3); q_st(4); q_st(5)]];
     curv = [curv, [q_st(1); q_st(2)]];
     q_0 = q_st;
@@ -58,15 +73,44 @@ end
 hold off
 
 %%
+% General grid
+q_0 = [1e-3; 1e-3; 0.0; 0.65; 0.0];
+goals = [];
+curv = [];
+path = [];
+results = [];
+lb = [-Inf,-Inf, -1, 0.33, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 1, 1.2, 2*pi/4];
+for xg = -1:0.25:1
+    for zg = 0.15:0.15:0.6
+        goal = [xg; zg];
+        goals = [goal, goals];
+        [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+        results = [results exitflag];
+        q_0 = q_st;
+        path = [path, [q_st(3); q_st(4); q_st(5)]];
+        curv = [curv, [q_st(1); q_st(2)]];
+        plot_config(q_st,zg/0.65+0.05)
+        hold on
+    end
+end
+hold off
+
+%%
 % Plot constraints
 hold on
 xline([lb(3) ub(3)],'r')
-yline([lb(4) lb(4)],'r')
+yline([lb(4) ub(4)],'r')
 th = 0:pi/50:2*pi;
-xunit = 0.85 * cos(th);
-yunit = 0.85 * sin(th) + 0.333;
+xunit = radial_constraint * cos(th);
+yunit = radial_constraint * sin(th) + 0.333;
 h = plot(xunit, yunit,'r');
 hold off
+
+%%
+% Path output
+writematrix(path','static_solver_path.csv');
+save('solution','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %%
 % Objective function - minimise endpoint goal distance
@@ -84,11 +128,11 @@ end
 % Constraints
 function [c,ceq] = nonlcon(q)
     % Steady state of object
-    global p_vals k Theta_bar
+    global p_vals k Theta_bar radial_constraint
     G_eval = G_fcn(p_vals,q);
     ceq = G_eval(1:2) + k.*[q(1)-Theta_bar(1); q(2)-Theta_bar(2)];
     % Circular workspace region
-    c = q(3)^2 + (q(4)-0.333)^2 - 0.85^2;
+    c = q(3)^2 + (q(4)-0.333)^2 - radial_constraint^2;
 end
 
 

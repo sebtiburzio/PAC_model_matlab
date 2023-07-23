@@ -4,22 +4,22 @@ addpath('automatically_generated')
 
 %%
 global p_vals k Theta_bar
-p_vals = [0.4, 0.23, 0.75, 0.015]';
+p_vals = [0.6, 0.23, 0.6, 0.02]';
 k = 0.01;
 Theta_bar = [-0.5,3];
 Pi = [k Theta_bar];
 
 global goal
-q_0 = [1e-3; 1e-3; 0.1; 0.9; 0.0];
+q_0 = [1e-3; 1e-3; 0.0; 0.9; pi/4];
 
-lb = [-Inf,-Inf, -0.4, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 0.4, 0.9, 2*pi/4];
+lb = [-Inf,-Inf, -1, 0.333, 0*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 1, 1.0, 4*pi/4];
 global radial_constraint
-radial_constraint = 0.85;
+radial_constraint = 0.55;
 
 %%
 % Position only
-goal = [0.2; 0.14];
+goal = [-0.153; 0.333];
 [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
 goals = goal;
 results = exitflag;
@@ -28,7 +28,7 @@ curv = [q_st(1); q_st(2)];
 
 %%
 % Position and orientation
-goal = [0.2; 0.2; pi/2];
+goal = [0.14; 0.333; 0];
 [q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon)
 goals = goal;
 results = exitflag;
@@ -81,8 +81,8 @@ path = [];
 results = [];
 lb = [-Inf,-Inf, -1, 0.33, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1, 1.2, 2*pi/4];
-for xg = -1:0.25:1
-    for zg = 0.15:0.15:0.6
+for xg = 0:0.22:0.66
+    for zg = 0.1:0.2:0.5
         goal = [xg; zg];
         goals = [goal, goals];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
@@ -90,7 +90,7 @@ for xg = -1:0.25:1
         q_0 = q_st;
         path = [path, [q_st(3); q_st(4); q_st(5)]];
         curv = [curv, [q_st(1); q_st(2)]];
-        plot_config(q_st,zg/0.65+0.05)
+        plot_config(q_st,zg/0.75+0.05)
         hold on
     end
 end
@@ -109,8 +109,8 @@ hold off
 
 %%
 % Path output
-writematrix(path','static_solver_path.csv');
-save('solution','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
+writematrix(path','black_grid.csv');
+save('black_grid','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %%
 % Objective function - minimise endpoint goal distance
@@ -134,9 +134,3 @@ function [c,ceq] = nonlcon(q)
     % Circular workspace region
     c = q(3)^2 + (q(4)-0.333)^2 - radial_constraint^2;
 end
-
-
-
-
-
-

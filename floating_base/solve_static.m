@@ -81,19 +81,24 @@ path = [];
 results = [];
 lb = [-Inf,-Inf, -1, 0.33, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1, 1.2, 2*pi/4];
-for xg = 0:0.22:0.66
-    for zg = 0.1:0.2:0.5
+for zg = 0.1:0.2:0.5
+    for xg = 0:0.22:0.66
         goal = [xg; zg];
-        goals = [goal, goals];
+        goals = [goals, goal];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-        results = [results exitflag];
+        results = [results, exitflag];
         q_0 = q_st;
         path = [path, [q_st(3); q_st(4); q_st(5)]];
         curv = [curv, [q_st(1); q_st(2)]];
+        scatter(goal(1),goal(2),50,'kx')
+        hold on
         plot_config(q_st,zg/0.75+0.05)
         hold on
+        endpt = fk_fcn(p_vals, q_st, 1, 0);
+        plot([endpt(1) goal(1)], [endpt(2) goal(2)],'k:')
     end
 end
+plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
 hold off
 
 %%

@@ -4,22 +4,22 @@ addpath('automatically_generated')
 
 %%
 global p_vals k Theta_bar
-p_vals = [0.6, 0.23, 0.6, 0.02]';
-k = 0.01;
-Theta_bar = [-0.5,3];
+p_vals = [0.4, 0.23, 0.75, 0.015]';
+k = 0.0206;
+Theta_bar = [-2.7211, -0.9630];
 Pi = [k Theta_bar];
 
 global goal
-q_0 = [1e-3; 1e-3; 0.0; 0.9; pi/4];
+q_0 = [1e-3; 1e-3; 0.0; 0.9; 0];
 
 lb = [-Inf,-Inf, -1, 0.333, 0*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 1, 1.0, 4*pi/4];
+ub = [Inf, Inf, 1, 1.2, 0*pi/4];
 global radial_constraint
-radial_constraint = 0.55;
+radial_constraint = 1.2;
 
 %%
 % Position only
-goal = [-0.153; 0.333];
+goal = [-0.153,0.14];
 [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
 goals = goal;
 results = exitflag;
@@ -74,25 +74,25 @@ hold off
 
 %%
 % General grid
-q_0 = [1e-3; 1e-3; 0.0; 0.65; 0.0];
+q_0 = [1e-3; 1e-3; -0.3; 0.65; pi/4];
 goals = [];
 curv = [];
 path = [];
 results = [];
 lb = [-Inf,-Inf, -1, 0.33, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1, 1.2, 2*pi/4];
-for zg = 0.1:0.2:0.5
-    for xg = 0:0.22:0.66
+for zg = 0.15:0.1:0.35
+    for xg = 0.0:0.22:0.66
         goal = [xg; zg];
         goals = [goals, goal];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
         results = [results, exitflag];
-        q_0 = q_st;
+        %q_0 = q_st;
         path = [path, [q_st(3); q_st(4); q_st(5)]];
         curv = [curv, [q_st(1); q_st(2)]];
         scatter(goal(1),goal(2),50,'kx')
         hold on
-        plot_config(q_st,zg/0.75+0.05)
+        plot_config(q_st,zg/0.4+0.1)
         hold on
         endpt = fk_fcn(p_vals, q_st, 1, 0);
         plot([endpt(1) goal(1)], [endpt(2) goal(2)],'k:')
@@ -114,8 +114,8 @@ hold off
 
 %%
 % Path output
-writematrix(path','black_grid.csv');
-save('black_grid','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
+writematrix(path','orange_grid_horiz_RHS.csv');
+save('orange_grid_horiz_RHS','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %%
 % Objective function - minimise endpoint goal distance

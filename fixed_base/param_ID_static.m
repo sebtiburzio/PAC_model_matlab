@@ -2,8 +2,8 @@ clear
 addpath('automatically_generated/fixed')
 
 %%
-p_vals = [0.4, 0.23, 0.75, 0.015];
-range = [1,228];
+p_vals = [0.6, 0.23, 0.6, 0.02];
+range = [1,length(Gamma)];
 num_samples = range(2) - range(1) + 1;
 Gamma_set = -Gamma(range(1):range(2)); % Note - use -ve Gamma since data is robot angle
 Theta_set = [Theta0(range(1):range(2))'; Theta1(range(1):range(2))'];
@@ -13,8 +13,9 @@ Theta_set = [Theta0(range(1):range(2))'; Theta1(range(1):range(2))'];
 clear delta Y
 for sample = 1:num_samples
 
-    RHS = -Gv_fcn(p_vals',Theta_set(:,sample),Gamma_set(sample)); 
-    Y_n = [Theta_set(:,sample), [-1 0; 0 -1]];
+    RHS = -Gv_fcn(p_vals',Theta_set(:,sample),Gamma_set(sample));
+    Y_n = [Theta_set(1,sample)+Theta_set(2,sample)/2   -1   -1/2;
+           Theta_set(1,sample)/2+Theta_set(2,sample)/3 -1/2 -1/3];
     
     if sample == 1
         delta = RHS;

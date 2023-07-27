@@ -1,5 +1,5 @@
-data = readmatrix("data_in/0619/black_swing/theta_evolution.csv");
-t = data(:,1)';
+data = readmatrix("data_in/0619/orange_swing/theta_evolution.csv");
+ts = data(:,1)';
 Theta0 = data(:,2)';
 Theta1 = data(:,3)';
 dTheta0 = data(:,4)';
@@ -7,7 +7,7 @@ dTheta1 = data(:,5)';
 ddTheta0 = data(:,6)';
 ddTheta1 = data(:,7)';
 
-num_samples = length(t);
+num_samples = length(ts);
 
 Theta = [Theta0; Theta1];
 dTheta = [dTheta0; dTheta1];
@@ -105,12 +105,12 @@ for sample = 1:num_samples
 end
 
 %% Identify B/C Scale and Beta
-p_vals = [0.6, 0.23, 0.61, 0.02]';
+p_vals = [0.4, 0.23, 0.75, 0.015]';
 
-k = 0.01;
-Theta_bar = [-0.5;3];
+k = 0.0819;
+Theta_bar = [-1.2516; 0.9568];
 
-num_samples = 49;%length(t);
+num_samples = length(ts);
 
 for sample = 1:num_samples
     

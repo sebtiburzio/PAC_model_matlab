@@ -8,16 +8,16 @@ addpath('automatically_generated')
 %Object properties
 global p_vals k Theta_bar
 p_vals = [0.6, 0.23, 0.6, 0.02]';
-k = 0.1;
-Theta_bar = [-0.5, 3];
+k = 0.1799;
+Theta_bar = [-0.0463, 1.3731];
 Pi = [k Theta_bar];
 
 global goal
 % Constraints
-lb = [-Inf,-Inf, -1, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 1, 0.85, 2*pi/4];
+lb = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 1.2, 1.2, 2*pi/4];
 global radial_constraint
-radial_constraint = 0.85;
+radial_constraint = 0.85; % Centered on Joint1
 
 %%
 % SOLVERS
@@ -81,31 +81,48 @@ hold off
 
 %%
 % Grid - solve and plot
-q_0 = [1e-3; 1e-3; 0.0; 0.9; 0];
 goals = [];
 curv = [];
 path = [];
 results = [];
-lb = [-Inf,-Inf, -1, 0.33, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 1, 1.2, 2*pi/4];
-for zg = 0.1:0.2:0.5
-    for xg = 0.0:0.22:0.66
+lb = [-Inf,-Inf, -1.2, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 1.2, 1.2, 4*pi/4];
+radial_constraint = 0.55; % Centered on Joint1
+q_0 = [1e-3; 1e-3; 0; 0.8; 0];
+for zg = 0.25:0.1:0.35
+    for xg = -0.7:0.1:0.7
         goal = [xg; zg];
         goals = [goals, goal];
+%         if xg < 0
+%             q_0 = [1e-3; 1e-3; xg; zg+p_vals(3); 0.1]; % Attempt to guide solution to vertical config
+%         else
+%             q_0 = [1e-3; 1e-3; xg; zg+p_vals(3); -0.1];
+%         end
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-        results = [results, exitflag];
         %q_0 = q_st;
+        results = [results, exitflag];
         path = [path, [q_st(3); q_st(4); q_st(5)]];
         curv = [curv, [q_st(1); q_st(2)]];
         scatter(goal(1),goal(2),50,'kx')
         hold on
-        plot_config(q_st,zg/0.4+0.1)
+        plot_config(q_st,zg/0.75+0.05)
         hold on
         endpt = fk_fcn(p_vals, q_st, 1, 0);
         plot([endpt(1) goal(1)], [endpt(2) goal(2)],'k:')
     end
 end
 plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
+hold off
+
+%%
+% Plot constraints
+hold on
+xline([lb(3) ub(3)],'r')
+yline([lb(4) ub(4)],'r')
+th = 0:pi/50:2*pi;
+xunit = radial_constraint * cos(th);
+yunit = radial_constraint * sin(th) + 0.333;
+h = plot(xunit, yunit,'r');
 hold off
 
 %% 
@@ -179,17 +196,6 @@ plot([flip(LHS_meas(:,6)); RHS_meas(:,6)],[flip(LHS_meas(:,7)); RHS_meas(:,7)],C
 axis equal
 xlim([-0.75,0.75])
 hold off
-   
-%%
-% Plot constraints
-hold on
-xline([lb(3) ub(3)],'r')
-yline([lb(4) ub(4)],'r')
-th = 0:pi/50:2*pi;
-xunit = radial_constraint * cos(th);
-yunit = radial_constraint * sin(th) + 0.333;
-h = plot(xunit, yunit,'r');
-hold off
 
 %%
 % OUTPUT
@@ -203,7 +209,7 @@ save('Xn043Yn200Z847P154','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb
 % Objective function - minimise endpoint goal distance
 function obj = f(q)
     global p_vals goal
-    obj = norm(fk_fcn(p_vals, q, 1, 0) - goal);
+    obj = norm(fk_fcn(p_vals, q, 1, 0) - goal);% + q(5)*q(5)*0.05;
 end
 
 % Objective function - minimise endpoint goal distance inc orientation TODO - correct measure of orientation error

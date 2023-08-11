@@ -14,7 +14,7 @@ global p_vals
     for i_t = 1:length(time_vect)
         xy_c = nan(length(s_vect),2);
         for i_s = 1:length(s_vect)
-            xy_c(i_s,:) = fk_fcn(p_vals', [x_ev_res.Data(i_t,1),x_ev_res.Data(i_t,2)]', s_vect(i_s), 0);
+            xy_c(i_s,:) = fk_fcn(p_vals, [x_ev_res.Data(i_t,1),x_ev_res.Data(i_t,2)]', s_vect(i_s), 0);
         end
 
         if type == 1

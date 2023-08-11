@@ -2,7 +2,8 @@ clear
 addpath('automatically_generated/fixed')
 
 %%
-p_vals = [0.6, 0.23, 0.6, 0.02];
+% TODO - load parameters from file
+p_vals = [0.42, 0.03, 0.4, 0.02];
 range = [1,length(Gamma)];
 num_samples = range(2) - range(1) + 1;
 Gamma_set = -Gamma(range(1):range(2)); % Note - use -ve Gamma since data is robot angle

@@ -18,9 +18,9 @@ if abs(x(2)) < 1e-5
     x(2) = 1e-5;
 end
 
-B = B_fcn(p_vals',x);
-G = Gv_fcn(p_vals',x,G_dir);
-C = C_fcn(p_vals',x,dx);
+B = B_fcn(p_vals,x);
+G = Gv_fcn(p_vals,x,G_dir);
+C = C_fcn(p_vals,x,dx);
 
 % ddx = B*BC_Scale\(-G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);
 ddx = B*BC_Scale\(-C*BC_Scale*dx -G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);

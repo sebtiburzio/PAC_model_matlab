@@ -17,6 +17,6 @@ if abs(x(2)) < 1e-5
     x(2) = 1e-5;
 end
 
-G = Gv_fcn(p_vals',x,G_dir);
+G = Gv_fcn(p_vals,x,G_dir);
 
 ddx = 1e-3*eye(2)\(-G -K*(x-Theta_bar) -D*dx);

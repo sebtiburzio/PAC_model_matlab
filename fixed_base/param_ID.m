@@ -1,4 +1,13 @@
-data = readmatrix("data_in/0619/orange_swing/theta_evolution.csv");
+clear
+addpath('automatically_generated/fixed')
+
+%%
+% Load predefined object parameters
+load('../object_parameters/black_short_weighted.mat')
+
+%%
+% Load data
+data = readmatrix("data_in/0801/black_short_unweighted_swing/theta_evolution.csv");
 ts = data(:,1)';
 Theta0 = data(:,2)';
 Theta1 = data(:,3)';
@@ -22,6 +31,34 @@ c00 = Theta0 + Theta1/2.0;
 c01 = dTheta0 + dTheta1/2.0;
 c10 = Theta0/2.0 + Theta1/3.0;
 c11 = dTheta0/2.0 + dTheta1/3.0;
+
+%% Identify B/C Scale and Beta
+
+for sample = 1:num_samples
+    
+    RHS = -G_fcn(p_vals, Theta(:,sample)) - k_obj*[1 1/2; 1/2 1/3]*(Theta(:,sample)-Theta_bar);
+
+    Y_n = [
+            B_fcn(p_vals,Theta(:,sample))*ddTheta(:,sample) + C_fcn(p_vals,Theta(:,sample),dTheta(:,sample))*dTheta(:,sample), ...
+            [c0(sample); c1(sample)] 
+          ];
+    
+    if sample == 1
+        delta = RHS;
+        Y = Y_n;
+    else
+        delta = [delta; RHS];
+        Y = [Y; Y_n];
+    end
+
+end
+
+Pi = pinv(Y)*delta;
+BC_Scale = Pi(1)
+beta_obj = Pi(2)
+
+%% Save parameters
+save('black_short_weighted', 'p_vals', 'k_obj', 'Theta_bar', 'BC_Scale', 'beta_obj')
 
 %% Identify stiffness and damping
 % # Calc delta vector
@@ -104,31 +141,4 @@ for sample = 1:num_samples
 
 end
 
-%% Identify B/C Scale and Beta
-p_vals = [0.4, 0.23, 0.75, 0.015]';
 
-k = 0.0819;
-Theta_bar = [-1.2516; 0.9568];
-
-num_samples = length(ts);
-
-for sample = 1:num_samples
-    
-    RHS = -G_fcn(p_vals, Theta(:,sample)) - k*[1 1/2; 1/2 1/3]*(Theta(:,sample)-Theta_bar);
-
-    Y_n = [
-            B_fcn(p_vals,Theta(:,sample))*ddTheta(:,sample) + C_fcn(p_vals,Theta(:,sample),dTheta(:,sample))*dTheta(:,sample), ...
-            [c0(sample); c1(sample)] 
-          ];
-    
-    if sample == 1
-        delta = RHS;
-        Y = Y_n;
-    else
-        delta = [delta; RHS];
-        Y = [Y; Y_n];
-    end
-
-end
-
-Pi = pinv(Y)*delta

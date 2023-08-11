@@ -17,9 +17,9 @@ if abs(x(2)) < 1e-5
     x(2) = 1e-5;
 end
 
-B = B_fcn(p_vals',x);
-G = Gv_fcn(p_vals',x,0);
-% C = C_fcn(p_vals',x,dx);
+B = B_fcn(p_vals,x);
+G = Gv_fcn(p_vals,x,0);
+% C = C_fcn(p_vals,x,dx);
 
 ddx = B*B_Scale\(-G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0; F(1); F(2); F(3)]);  % without Coriolis/centrifugal
 % ddx = B*B_Scale\(-C*dx -G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0; F(1); F(2); F(3)]);  % without Coriolis/centrifugal

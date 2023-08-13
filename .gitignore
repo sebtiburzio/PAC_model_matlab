@@ -1,6 +1,10 @@
 fixed_base/dynamics.slxc
 fixed_base/q_ev.mat
 fixed_base/slprj/
+floating_base/dynamics.slxc
+floating_base/q_ev.mat
+floating_base/slprj/
 fixed_base/fwd_sim.asv
 fixed_base/param_ID_static.asv
 floating_base/solve_static.asv
+floating_base/fwd_sim.asv

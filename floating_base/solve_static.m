@@ -98,34 +98,31 @@ results = [];
 lb = [-Inf,-Inf, -1.2, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
 radial_constraint = 0.55; % Centered on Joint1
-xg_start = -0.1;
-xg_spacing = 0.02;
-xg_end = 0.1;
+xg_start = -0.7;
+xg_spacing = 0.1;
+xg_end = 0.7;
 zg_start = 0.55;
 zg_spacing = 0.1;
 zg_end = 0.55;
-% Use vertical steady state from model simulation as q_0 at first point
-% q_0_row = [-0.357303109718888; 1.373131904009318; xg_start+0.029802598965446; zg_start+0.595768690034612; 0];
-q_0 = [1e-3;1e-3;0;0.8;0];
 for zg = zg_start:zg_spacing:zg_end
     for xg = xg_start:xg_spacing:xg_end
         goal = [xg; zg];
         goals = [goals, goal];
-
-%         % If at start of row, use previous row start solution as q_0
-%         if (xg == xg_start)
-%             q_0 = q_0_row;
-%         % Otherwise use solution from previous point
-%         else
-%             q_0 = q_st;
-%         end
-
-        [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
-
-%         % If at start of row, save solution to be q_0 at start of next row
-%         if (xg == xg_start)
-%             q_0_row = q_st;
-%         end
+       
+        % Run optimisation with default q_0
+%         q_0 = [1e-3;1e-3;xg;zg+p_vals(3);0];
+        q_0 = [1e-3;1e-3;0.0;0.8;0];
+        [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+        % Run optimisation with random q_0s to try to improve
+        for i = 0:10
+            q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
+            [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+            if fval_n < fval
+                q_st = q_st_n;
+                fval = fval_n;
+                exitflag = exitflag_n;
+            end
+        end
 
         results = [results, exitflag];
         path = [path, [q_st(3); q_st(4); q_st(5)]];
@@ -150,6 +147,10 @@ xunit = radial_constraint * cos(th);
 yunit = radial_constraint * sin(th) + 0.333;
 h = plot(xunit, yunit,'r');
 hold off
+
+%%
+writematrix(path','with_phi_cost_55.csv');
+save('with_phi_cost_55','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %% 
 % PLOTTING
@@ -232,40 +233,50 @@ save('Xn043Yn200Z847P154','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb
 %%
 % Cost function characterisation
 global theta0_grid
-theta0_grid = -9.5:1:9.5;
+theta0_grid = -6:0.1:-1e-3;
 global theta1_grid
-theta1_grid = -9.5:1:9.5;
+theta1_grid = 1e-3:0.1:8;
 global x_grid
-x_grid = -0.3:0.1:0.3;
+x_grid = -0.0:0.1:0.0;
 global z_grid
-z_grid = 0.7:0.1:(0.35+0.6);
+z_grid = 0.7:0.1:0.7;
 global phi_grid
-phi_grid = -3*pi/4:pi/12:3*pi/4;
+phi_grid = (pi/180)*(0:1:135);
 
 goal_calc = [0;0.35];
 global cost_grid
 cost_grid = Inf*ones(length(theta0_grid),length(theta1_grid),length(x_grid),length(z_grid),length(phi_grid));
+model_constraint_violated = false;
 
 theta0_idx = 1;
 for theta0_calc = theta0_grid
+    theta0_calc
     theta1_idx = 1;
     for theta1_calc = theta1_grid
-        x_idx = 1;
-        for x_calc = x_grid
-            z_idx = 1;
-            for z_calc = z_grid
-                phi_idx = 1;
-                for phi_calc = phi_grid
+        phi_idx = 1;
+        for phi_calc = phi_grid
+            x_idx = 1;
+            for x_calc = x_grid
+                z_idx = 1;
+                for z_calc = z_grid
                     q_calc = [theta0_calc;theta1_calc;x_calc;z_calc;phi_calc];
                     G_eval = G_fcn(p_vals,q_calc);
-                    if all(abs((G_eval(1:2) + K*[theta0_calc-Theta_bar(1); theta1_calc-Theta_bar(2)]))) < 1e-6 % 1e-6 is default fmincon constraint tolerance
+                    if all(abs((G_eval(1:2) + K*[theta0_calc-Theta_bar(1); theta1_calc-Theta_bar(2)])) < 1e-6) % 1e-6 is default fmincon constraint tolerance
                         cost_grid(theta0_idx,theta1_idx,x_idx,z_idx,phi_idx) = norm(fk_fcn(p_vals, q_calc, 1, 0) - goal_calc);
+                    else
+                        % If the model constraint is violated we don't need to check any other X/Z points for the same Theta/Phi combination
+                        model_constraint_violated = true;
+                        break;
                     end
-                    phi_idx = phi_idx + 1;
+                    z_idx = z_idx + 1;
                 end
-                z_idx = z_idx + 1;
+                if model_constraint_violated == true
+                    model_constraint_violated = false;
+                    break;
+                end
+                x_idx = x_idx + 1;
             end
-            x_idx = x_idx + 1;
+            phi_idx = phi_idx + 1;
         end
         theta1_idx = theta1_idx + 1;
     end
@@ -273,7 +284,7 @@ for theta0_calc = theta0_grid
 end
 
 %% Save cost grid
-save('cost_grid_test', 'p_vals', 'k_obj', 'Theta_bar', 'goal_calc', ...
+save('cost_grid_check_model_const_1deg_tenthTheta', 'p_vals', 'k_obj', 'Theta_bar', 'goal_calc', ...
     'theta0_grid', 'theta1_grid', 'x_grid', 'z_grid', 'phi_grid', 'cost_grid');
 
 %%
@@ -302,7 +313,7 @@ end
 % Objective function - minimise endpoint goal distance
 function obj = f(q)
     global p_vals goal
-    Phi_cost = 0;%0.02*abs(q(5));
+    Phi_cost = 0.02*abs(q(5));
     endpt_cost = norm(fk_fcn(p_vals, q, 1, 0) - goal);
 %     if endpt_cost < 0.01
 %         endpt_cost = 0;

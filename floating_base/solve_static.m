@@ -27,7 +27,7 @@ global goal
 lb = [-Inf,-Inf, -1.2, 0.333, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
 global radial_constraint
-radial_constraint = 0.55; % Centered on Joint1
+radial_constraint = 0.5; % Centered on Joint1
 
 %%
 % SOLVERS
@@ -97,7 +97,7 @@ path = [];
 results = [];
 lb = [-Inf,-Inf, -1.2, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
-radial_constraint = 0.55; % Centered on Joint1
+radial_constraint = 0.5; % Centered on Joint1
 xg_start = -0.7;
 xg_spacing = 0.1;
 xg_end = 0.7;
@@ -110,7 +110,6 @@ for zg = zg_start:zg_spacing:zg_end
         goals = [goals, goal];
        
         % Run optimisation with default q_0
-%         q_0 = [1e-3;1e-3;xg;zg+p_vals(3);0];
         q_0 = [1e-3;1e-3;0.0;0.8;0];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
         % Run optimisation with random q_0s to try to improve
@@ -149,7 +148,7 @@ h = plot(xunit, yunit,'r');
 hold off
 
 %%
-writematrix(path','with_phi_cost_55.csv');
+writematrix(path','sequence.csv');
 save('with_phi_cost_55','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %% 

@@ -101,9 +101,9 @@ radial_constraint = 0.5; % Centered on Joint1
 xg_start = -0.7;
 xg_spacing = 0.1;
 xg_end = 0.7;
-zg_start = 0.55;
+zg_start = 0.05;
 zg_spacing = 0.1;
-zg_end = 0.55;
+zg_end = 0.25;
 for zg = zg_start:zg_spacing:zg_end
     for xg = xg_start:xg_spacing:xg_end
         goal = [xg; zg];
@@ -112,23 +112,23 @@ for zg = zg_start:zg_spacing:zg_end
         % Run optimisation with default q_0
         q_0 = [1e-3;1e-3;0.0;0.8;0];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-        % Run optimisation with random q_0s to try to improve
-        for i = 0:10
-            q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
-            [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-            if fval_n < fval
-                q_st = q_st_n;
-                fval = fval_n;
-                exitflag = exitflag_n;
-            end
-        end
+%         % Run optimisation with random q_0s to try to improve
+%         for i = 0:10
+%             q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
+%             [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+%             if fval_n < fval
+%                 q_st = q_st_n;
+%                 fval = fval_n;
+%                 exitflag = exitflag_n;
+%             end
+%         end
 
         results = [results, exitflag];
         path = [path, [q_st(3); q_st(4); q_st(5)]];
         curv = [curv, [q_st(1); q_st(2)]];
         scatter(goal(1),goal(2),50,'kx')
         hold on
-        plot_config(q_st,1);%zg/0.75+0.05)
+        plot_config(q_st,zg/0.65+0.05)
         hold on
         endpt = fk_fcn(p_vals, q_st, 1, 0);
         plot([endpt(1) goal(1)], [endpt(2) goal(2)],'k:')
@@ -136,6 +136,50 @@ for zg = zg_start:zg_spacing:zg_end
 end
 plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
 hold off
+
+% Plot constraints
+hold on
+xline([lb(3) ub(3)],'r')
+yline([lb(4) ub(4)],'r')
+th = 0:pi/50:2*pi;
+xunit = radial_constraint * cos(th);
+yunit = radial_constraint * sin(th) + 0.333;
+h = plot(xunit, yunit,'r');
+hold off
+
+%%
+% Full orientation
+goals = [];
+curv = [];
+path = [];
+results = [];
+lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+radial_constraint = 2.0; % Centered on Joint1
+for phig = -pi/4:pi/12:3*pi/4
+    goal = [0.0; 0.4; phig];
+    goals = [goals, goal];
+   
+    % Run optimisation with default q_0
+    q_0 = [1e-3;1e-3;0.0;0.8;0];
+    [q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon);
+%     % Run optimisation with random q_0s to try to improve
+%     for i = 0:10
+%         q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
+%         [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
+%         if fval_n < fval
+%             q_st = q_st_n;
+%             fval = fval_n;
+%             exitflag = exitflag_n;
+%         end
+%     end
+
+    results = [results, exitflag];
+    path = [path, [q_st(3); q_st(4); q_st(5)]];
+    curv = [curv, [q_st(1); q_st(2)]];
+    plot_config(q_st,1);%zg/0.75+0.05)
+    hold on
+end
 
 % Plot constraints
 hold on
@@ -312,7 +356,7 @@ end
 % Objective function - minimise endpoint goal distance
 function obj = f(q)
     global p_vals goal
-    Phi_cost = 0.02*abs(q(5));
+    Phi_cost = 0;%0.02*abs(q(5));
     endpt_cost = norm(fk_fcn(p_vals, q, 1, 0) - goal);
 %     if endpt_cost < 0.01
 %         endpt_cost = 0;

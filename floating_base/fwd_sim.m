@@ -1,31 +1,40 @@
 %% Init
 clear
 addpath('automatically_generated')
+global k_obj K p_vals Theta_bar
+global beta_obj D
 
-% Object properties
-% Object properties
-global p_vals
-p_vals = [0.4, 0.23, 0.75, 0.15];
+%%
+% Load predefined object parameters
+load('../object_parameters/orange_short_unweighted.mat')
 
-global K Theta_bar D
-k_obj = 5e-2;
-beta_obj = 2.5e-2;
-k_base = diag([0 0 0 ]);
+%%
+% % Manually defined object parameters (overwrites loaded parameters)
+% % Static properties
+% p_vals = [0.6, 0.23, 0.6, 0.02]';
+% k_obj = 0.1965;
+% Theta_bar = [0.1421; 1.2391];
+% 
+% % Dynamic properties
+% beta_obj = 0.0547;
+
+%%
+k_base = diag([0 0 0]);
 beta_base = diag([1e-1 1e-1 1e-1]);
-Theta_bar = [-0.1104; 0.1523; 0; 0; 0];
+Theta_bar = [Theta_bar(1); Theta_bar(2) 0; 0; 0];
 H = [1, 1/2; 1/2, 1/3];
 K = [k_obj*H     zeros(2,3);
      zeros(3,2)  k_base];
 D = [beta_obj*H  zeros(2,3);
      zeros(3,2)  beta_base];
 
-global G_Scale B_Scale
+% Simulation set up
+global G_Scale G_dir
 G_Scale = 1.0;
-B_Scale = 1.0;
-
-% Put initial condition here
-x_0 = [1e-3; 1e-3; 0; 0; 0];
-dx_0 = [0; 0; 0; 0; 0];
+G_dir = 0.0;
+% Initial condition
+x_0 = [Theta0(1); Theta1(1)];
+dx_0 = [dTheta0(1); dTheta1(1)];
 
 %% Call simulink
 out = sim('dynamics');

@@ -23,8 +23,8 @@ syms s v d real
 tic
 
 % Spine x,z in object base frame, defined as if it was reflected in the robot XY plane
-alpha = -(theta_0*v + 0.5*theta_1*v^2); % negative curvature so sense matches robot frame Y axis rotation
-fk_fcn(1) = L*int(sin(alpha),v, 0, s); % x. when theta=0, x=0.
+alpha = theta_0*v + 0.5*theta_1*v^2;
+fk_fcn(1) = -L*int(sin(alpha),v, 0, s); % x. when theta=0, x=0.
 fk_fcn(2) = -L*int(cos(alpha),v, 0, s); % z. when theta=0, z=-L. 
 
 % FK of midpoint and endpoint in base frame (for curvature IK)
@@ -33,14 +33,14 @@ fk_fcn(2) = -L*int(cos(alpha),v, 0, s); % z. when theta=0, z=-L.
 %J_mid_fixed = jacobian(fk_mid_fixed,[theta_0; theta_1]);
 %J_end_fixed = jacobian(fk_end_fixed,[theta_0; theta_1]);
 
-% 3DOF floating base
-rot_phi = [cos(phi) sin(phi);
-          -sin(phi) cos(phi)];                  % +ve rotations around robot base Y axis
+% 3DOF floating base 
+rot_phi = [cos(phi) sin(phi); % +ve rotations around robot base Y axis (CW in XZ plane)
+          -sin(phi) cos(phi)];                  
 rot_alpha = [cos(subs(alpha,v,s)) sin(subs(alpha,v,s));
-            -sin(subs(alpha,v,s)) cos(subs(alpha,v,s))]; 
-fk_fcn = [x; z] + rot_phi*(fk_fcn + D*rot_alpha*[0; d]);
+             -sin(subs(alpha,v,s)) cos(subs(alpha,v,s))]; 
+fk_fcn = [x; z] + rot_phi*(fk_fcn + D*rot_alpha*[d; 0]);
 
-fka_fcn = [fk_fcn; subs(alpha,v,s)];
+fka_fcn = [fk_fcn; phi + subs(alpha,v,s)];
 
 toc
 
@@ -113,10 +113,10 @@ tic
 
 % TODO - add base mass
 J = jacobian(subs(fk_fcn,s, 1),[theta_0; theta_1; x; z; phi]);
-B_fcn = 0.5*m_E*int(J'*J, d, -1/2, 1/2);
+B_fcn = m_E*int(J'*J, d, -1/2, 1/2);
 for i = 0:num_masses-1
     J = jacobian(subs(fk_fcn, s, i/num_masses + 1/(num_masses*2)),[theta_0; theta_1; x; z; phi]);
-    B_fcn = B_fcn + 0.5*(m_L/num_masses)*int(J'*J, d, -1/2, 1/2);
+    B_fcn = B_fcn + (m_L/num_masses)*int(J'*J, d, -1/2, 1/2);
 end
 
 toc

@@ -8,7 +8,7 @@ function ddx = f_fcn(x,dx)
 
 global p_vals G_dir
 global K Theta_bar D
-global G_Scale BC_Scale
+global G_Scale
 
 if abs(x(1)) < 1e-5
     x(1) = 1e-5;
@@ -22,5 +22,5 @@ B = B_fcn(p_vals,x);
 G = Gv_fcn(p_vals,x,G_dir);
 C = C_fcn(p_vals,x,dx);
 
-% ddx = B*BC_Scale\(-G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);
-ddx = B*BC_Scale\(-C*BC_Scale*dx -G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);
+% ddx = B\(-G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);
+ddx = B\(-C*dx -G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);

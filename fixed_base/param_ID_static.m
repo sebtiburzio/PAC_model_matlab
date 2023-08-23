@@ -1,9 +1,13 @@
 clear
-addpath('automatically_generated/fixed')
+addpath('automatically_generated')
 
 %%
-% TODO - load parameters from file
-p_vals = [0.42, 0.03, 0.4, 0.02];
+% Load predefined object parameters
+load('../object_parameters/black_weighted.mat')
+
+%%
+% Load data
+data = readmatrix("data_in/0802/black_weighted_equilibria/theta_equilibria.csv");
 range = [1,length(Gamma)];
 num_samples = range(2) - range(1) + 1;
 Gamma_set = -Gamma(range(1):range(2)); % Note - use -ve Gamma since data is robot angle
@@ -14,7 +18,7 @@ Theta_set = [Theta0(range(1):range(2))'; Theta1(range(1):range(2))'];
 clear delta Y
 for sample = 1:num_samples
 
-    RHS = -Gv_fcn(p_vals',Theta_set(:,sample),Gamma_set(sample));
+    RHS = -Gv_fcn(p_vals,Theta_set(:,sample),Gamma_set(sample));
     Y_n = [Theta_set(1,sample)+Theta_set(2,sample)/2   -1   -1/2;
            Theta_set(1,sample)/2+Theta_set(2,sample)/3 -1/2 -1/3];
     
@@ -40,7 +44,7 @@ clear delta Y
 for sample = 1:num_samples
 
     %   RHS = -G(Theta,Gamma) -K*Theta
-    RHS = -G_scale*Gv_fcn(p_vals',Theta_set(:,sample),Gamma_set(sample)) -K_known*Theta_set(:,sample);
+    RHS = -G_scale*Gv_fcn(p_vals,Theta_set(:,sample),Gamma_set(sample)) -K_known*Theta_set(:,sample);
     Y_n = -K_known*Theta_set(sample);  
     
     if sample == 1

@@ -1,12 +1,12 @@
 %% Init
 clear
-addpath('automatically_generated/fixed')
+addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
-global beta_obj D BC_Scale
+global beta_obj D
 
 %%
 % Load predefined object parameters
-load('../object_parameters/black_weighted.mat')
+load('../object_parameters/orange_short_unweighted.mat')
 
 %%
 % % Manually defined object parameters (overwrites loaded parameters)
@@ -17,7 +17,6 @@ load('../object_parameters/black_weighted.mat')
 % 
 % % Dynamic properties
 % beta_obj = 0.0547;
-% BC_Scale = 1.8971;
 
 %%
 H = [1, 1/2; 1/2, 1/3];
@@ -29,19 +28,19 @@ global G_Scale G_dir
 G_Scale = 1.0;
 G_dir = 0.0;
 % Initial condition
-x_0 = [1e-3; 1e-3];
-dx_0 = [0; 0];
+x_0 = [Theta0(1); Theta1(1)];
+dx_0 = [dTheta0(1); dTheta1(1)];
 
 %% Simulate full dynamic system
-out = sim('ss_solver');
+out = sim('dynamics');
 q_ev = out.q_ev; % if sim doesn't finish: q_ev = load('q_ev.mat');
 %plot_robot(q_ev)
 
 %% Plot Theta evolution
-% plot(ts,Theta0)
+plot(ts,Theta0)
 hold on
 plot(q_ev.Time,q_ev.Data(:,1))
-% plot(ts,Theta1)
+plot(ts,Theta1)
 plot(q_ev.Time,q_ev.Data(:,2))
 hold off
 
@@ -51,11 +50,11 @@ stop_time = q_ev.time(end);
 time_vect = linspace(0,stop_time,n_step);
 q_ev_res = resample(q_ev,time_vect);
 data = [time_vect', q_ev_res.Data(:,1), q_ev_res.Data(:,2)];
-writematrix(data,'orange_weighted_swing_sim_B2.csv');
+writematrix(data,'orange_short_unweighted_swing_sim.csv');
 
-%% Plot steady state comparison
-% [~, ss_range] = min(abs(Gamma-[3*pi/4 pi/2 pi/4 0 -pi/4 -pi/2-3*pi/4])); % Select indexes in Gamma closest to desired plot angles
-[~, ss_range] = min(abs(Gamma-(6:11)*pi/12));
+%% Plot steady state comparison - floating base frame
+[~, ss_range] = min(abs(Gamma-[3*pi/4 pi/2 pi/4 0 -pi/4 -pi/2 -3*pi/4])); % Select indexes in Gamma closest to desired plot angles
+% [~, ss_range] = min(abs(Gamma-(4:4)*pi/12));
 for i = ss_range
     G_dir = -Gamma(i); % Note- use -ve Gamma since since data is robot angle
     out = sim('ss_solver');
@@ -64,8 +63,24 @@ for i = ss_range
     hold on
     plot_config(q_ev.Data(end,1), q_ev.Data(end,2), 1,  Gamma(i))
     hold on
-%     scatter(X_mid(i),Z_mid(i),30,[0.4660 0.6740 0.1880],'+')
-%     scatter(X_end(i),Z_end(i),30,[0 0.4470 0.7410],'+')
+    scatter(X_mid(i)*cos(Gamma(i))+Z_mid(i)*sin(Gamma(i)),-X_mid(i)*sin(Gamma(i))+Z_mid(i)*cos(Gamma(i)),100,[0.4660 0.6740 0.1880],'x')
+    scatter(X_end(i)*cos(Gamma(i))+Z_end(i)*sin(Gamma(i)),-X_end(i)*sin(Gamma(i))+Z_end(i)*cos(Gamma(i)),100,[0 0.4470 0.7410],'x')
+end
+xlabel('x_B (m)')
+ylabel('y_B (m)')
+%% Plot steady state comparison - fixed base frame
+[~, ss_range] = min(abs(Gamma-[3*pi/4 pi/2 pi/4 0 -pi/4 -pi/2 -3*pi/4])); % Select indexes in Gamma closest to desired plot angles
+% [~, ss_range] = min(abs(Gamma-(6:11)*pi/12));
+for i = ss_range
+    G_dir = -Gamma(i); % Note- use -ve Gamma since since data is robot angle
+    out = sim('ss_solver');
+    q_ev = out.q_ev;
+    plot_config(Theta0(i),Theta1(i), 0.5, 0)
+    hold on
+    plot_config(q_ev.Data(end,1), q_ev.Data(end,2), 1, 0)
+    hold on
+    scatter(X_mid(i),Z_mid(i),40,[0.4660 0.6740 0.1880],'x')
+    scatter(X_end(i),Z_end(i),40,[0 0.4470 0.7410],'x')
 end
 
 %% Visualise steady state endpoint error
@@ -78,29 +93,64 @@ for i = 1:length(Gamma)
     q_ev = out.q_ev;
     endpt_model = fk_fcn(p_vals, [q_ev.Data(end,1), q_ev.Data(end,2)]',1,0);
     del_endpt(i) = norm([X_end(i); Z_end(i)]-endpt_model);
-    scatter(X_end(i), Z_end(i), 50,'kx')
-    scatter(endpt_model(1), endpt_model(2), 20, [0 0.4470 0.7410], 'filled')
-    plot([endpt_model(1) X_end(i)], [endpt_model(2) Z_end(i)],'k:')
+%     scatter(X_end(i), Z_end(i), 50,'kx')
+%     scatter(endpt_model(1), endpt_model(2), 20, [0 0.4470 0.7410], 'filled')
+%     plot([endpt_model(1) X_end(i)], [endpt_model(2) Z_end(i)],'k:')
 end
 axis equal
 hold off 
 figure
-scatter(Gamma,del_endpt)
-axis square
-% Fit quadratic to error
-coeffs = polyfit(Gamma,del_endpt,2);
-hold on
-xpts = linspace(-pi,pi);
-plot(xpts,coeffs(1)+coeffs(2)*xpts+coeffs(3)*xpts.^2)
-hold off
+scatter(Gamma,del_endpt,30,[0 0.4470 0.7410],'filled')
+grid on
+xlabel('\phi (rad)')
+ylabel('\Delta p_{e,B} (m)')
+% % Fit quadratic to error
+% coeffs = polyfit(Gamma,del_endpt,2);
+% hold on
+% xpts = linspace(-pi,pi);
+% plot(xpts,coeffs(1)+coeffs(2)*xpts+coeffs(3)*xpts.^2)
+% hold off
 
 %% Determine endpoint location of model for whole Phi range
-Phi_range = -135:-1;
-Phi_range = [Phi_range 1:135];
-model_endpt = [];
+% Phi_range = -135:-1;
+% Phi_range = [Phi_range 1:135];
+Phi_range = 0:1:359;
+theta_eq = [];
+midpt_eq = [];
+endpt_eq = [];
+theta_eq_prev = [1e-3; 1e-3];
 for i = Phi_range
     G_dir = i*pi/180; % Note- use -ve Gamma since since data is robot angle
+    x_0 = theta_eq_prev;
     out = sim('ss_solver');
     q_ev = out.q_ev;
-    model_endpt = [model_endpt fk_fcn(p_vals,[q_ev.Data(end,1), q_ev.Data(end,2)]',1,0)];
+    theta_eq_prev = [q_ev.Data(end,1), q_ev.Data(end,2)]';
+    theta_eq = [theta_eq theta_eq_prev];
+    midpt_eq = [midpt_eq fk_fcn(p_vals,theta_eq_prev,0.5,0)];
+    endpt_eq = [endpt_eq fk_fcn(p_vals,theta_eq_prev,1,0)];
 end
+
+%%
+save('equilibria_positive_dir','Phi_range','theta_eq','midpt_eq','endpt_eq')
+
+%%
+load('equilibria_negative_dir.mat');
+plot(theta_eq(1,:));
+%%
+max_neg = 210;
+Phi_range_n = flip(Phi_range(1:max_neg));
+theta_eq_n = flip(theta_eq(:,1:max_neg),2);
+midpt_eq_n = flip(midpt_eq(:,1:max_neg),2);
+endpt_eq_n = flip(endpt_eq(:,1:max_neg),2);
+%%
+load('equilibria_positive_dir.mat');
+plot(theta_eq(1,:));
+%%
+max_pos = 225;
+Phi_range = [Phi_range_n Phi_range(2:max_pos)];
+theta_eq = [theta_eq_n theta_eq(:,2:max_pos)];
+endpt_eq = [endpt_eq_n endpt_eq(:,2:max_pos)];
+midpt_eq = [midpt_eq_n midpt_eq(:,2:max_pos)];
+
+%%
+save('equilibria_span','Phi_range','theta_eq','midpt_eq','endpt_eq')

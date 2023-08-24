@@ -6,7 +6,7 @@ global beta_obj D
 
 %%
 % Load predefined object parameters
-load('../object_parameters/orange_short_unweighted.mat')
+load('../object_parameters/black_weighted.mat')
 
 %%
 % % Manually defined object parameters (overwrites loaded parameters)
@@ -19,9 +19,9 @@ load('../object_parameters/orange_short_unweighted.mat')
 % beta_obj = 0.0547;
 
 %%
-k_base = diag([0 0 0]);
+k_base = diag([0 1e4 0]);
 beta_base = diag([1e-1 1e-1 1e-1]);
-Theta_bar = [Theta_bar(1); Theta_bar(2) 0; 0; 0];
+Theta_bar = [Theta_bar(1); Theta_bar(2); 0; 0; 0];
 H = [1, 1/2; 1/2, 1/3];
 K = [k_obj*H     zeros(2,3);
      zeros(3,2)  k_base];
@@ -33,8 +33,8 @@ global G_Scale G_dir
 G_Scale = 1.0;
 G_dir = 0.0;
 % Initial condition
-x_0 = [Theta0(1); Theta1(1)];
-dx_0 = [dTheta0(1); dTheta1(1)];
+x_0 = [-0.357554385741698; 1.37347200688600; 0; 0; 0];
+dx_0 = [0; 0; 0; 0; 0];
 
 %% Call simulink
 out = sim('dynamics');

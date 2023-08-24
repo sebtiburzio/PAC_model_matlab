@@ -33,28 +33,30 @@ for sample = 1:num_samples
 end
 
 Pi = pinv(Y)*delta;
-Pi = [Pi(1); Pi(2)/Pi(1); Pi(3)/Pi(1)]
+k_id = Pi(1)
+theta_bar_0_id = Pi(2)/k_id
+theta_bar_1_id = Pi(3)/k_id
 
 %%
-% Theta_bar from static eqns with variable gravity field and prescribed K
-K_known = 1e-1*[1, 1/2; 1/2, 1/3];
-G_scale = 1.0;
-clear delta Y
-
-for sample = 1:num_samples
-
-    %   RHS = -G(Theta,Gamma) -K*Theta
-    RHS = -G_scale*Gv_fcn(p_vals,Theta_set(:,sample),Gamma_set(sample)) -K_known*Theta_set(:,sample);
-    Y_n = -K_known*Theta_set(sample);  
-    
-    if sample == 1
-        delta = RHS;
-        Y = Y_n;
-    else
-        delta = [delta; RHS];
-        Y = [Y; Y_n];
-    end
-
-end
-
-Pi = pinv(Y)*delta
+% % Theta_bar from static eqns with variable gravity field and prescribed K
+% K_known = 1e-1*[1, 1/2; 1/2, 1/3];
+% G_scale = 1.0;
+% clear delta Y
+% 
+% for sample = 1:num_samples
+% 
+%     %   RHS = -G(Theta,Gamma) -K*Theta
+%     RHS = -G_scale*Gv_fcn(p_vals,Theta_set(:,sample),Gamma_set(sample)) -K_known*Theta_set(:,sample);
+%     Y_n = -K_known*Theta_set(sample);  
+%     
+%     if sample == 1
+%         delta = RHS;
+%         Y = Y_n;
+%     else
+%         delta = [delta; RHS];
+%         Y = [Y; Y_n];
+%     end
+% 
+% end
+% 
+% Pi = pinv(Y)*delta

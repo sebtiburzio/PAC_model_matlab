@@ -1,5 +1,7 @@
 %%
 clear
+clear global
+rmpath('../fixed_base/automatically_generated')
 addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
 
@@ -8,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/black_weighted.mat')
+load('../object_parameters/orange_short_unweighted.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -95,6 +97,7 @@ goals = [];
 curv = [];
 path = [];
 results = [];
+endpts = [];
 lb = [-Inf,-Inf, -1.2, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
 radial_constraint = 0.5; % Centered on Joint1
@@ -103,8 +106,9 @@ xg_spacing = 0.1;
 xg_end = 0.7;
 zg_start = 0.05;
 zg_spacing = 0.1;
-zg_end = 0.25;
+zg_end = 0.35;
 for zg = zg_start:zg_spacing:zg_end
+    figure;
     for xg = xg_start:xg_spacing:xg_end
         goal = [xg; zg];
         goals = [goals, goal];
@@ -112,7 +116,7 @@ for zg = zg_start:zg_spacing:zg_end
         % Run optimisation with default q_0
         q_0 = [1e-3;1e-3;0.0;0.8;0];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-%         % Run optimisation with random q_0s to try to improve
+%        % Run optimisation with random q_0s to try to improve
 %         for i = 0:10
 %             q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
 %             [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
@@ -128,24 +132,28 @@ for zg = zg_start:zg_spacing:zg_end
         curv = [curv, [q_st(1); q_st(2)]];
         scatter(goal(1),goal(2),50,'kx')
         hold on
-        plot_config(q_st,zg/0.65+0.05)
+        plot_config(q_st,1);%zg/0.75+0.05)
         hold on
         endpt = fk_fcn(p_vals, q_st, 1, 0);
+        endpts = [endpts, endpt];
         plot([endpt(1) goal(1)], [endpt(2) goal(2)],'k:')
     end
+    % Plot constraints
+    hold on
+    xline([lb(3) ub(3)],'r')
+    yline([lb(4) ub(4)],'r')
+    th = 0:pi/50:2*pi;
+    xunit = radial_constraint * cos(th);
+    yunit = radial_constraint * sin(th) + 0.333;
+    h = plot(xunit, yunit,'r');
+    saveas(gcf,string(zg*100))
 end
-plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
+% plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
 hold off
 
-% Plot constraints
-hold on
-xline([lb(3) ub(3)],'r')
-yline([lb(4) ub(4)],'r')
-th = 0:pi/50:2*pi;
-xunit = radial_constraint * cos(th);
-yunit = radial_constraint * sin(th) + 0.333;
-h = plot(xunit, yunit,'r');
-hold off
+%%
+writematrix([path', goals', endpts'],'sequence.csv');
+save('vars','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'endpts', 'lb', 'ub', 'radial_constraint');
 
 %%
 % Full orientation
@@ -153,10 +161,10 @@ goals = [];
 curv = [];
 path = [];
 results = [];
-lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
+lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
 radial_constraint = 2.0; % Centered on Joint1
-for phig = -pi/4:pi/12:3*pi/4
+for phig = -pi/2:pi/12:3*pi/4
     goal = [0.0; 0.4; phig];
     goals = [goals, goal];
    
@@ -192,8 +200,8 @@ h = plot(xunit, yunit,'r');
 hold off
 
 %%
-writematrix(path','sequence.csv');
-save('with_phi_cost_55','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
+writematrix([path', goals'],'full_range_centered.csv');
+save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %% 
 % PLOTTING

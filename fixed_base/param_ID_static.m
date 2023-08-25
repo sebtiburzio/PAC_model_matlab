@@ -1,4 +1,6 @@
 clear
+clear global
+rmpath('../floating_base/automatically_generated')
 addpath('automatically_generated')
 
 %%

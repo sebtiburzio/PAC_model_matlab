@@ -1,12 +1,14 @@
 %% Init
 clear
+clear global
+rmpath('../floating_base/automatically_generated')
 addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
 global beta_obj D
 
 %%
 % Load predefined object parameters
-load('../object_parameters/orange_short_unweighted.mat')
+load('../object_parameters/orange_weighted.mat')
 
 %%
 % % Manually defined object parameters (overwrites loaded parameters)
@@ -28,8 +30,10 @@ global G_Scale G_dir
 G_Scale = 1.0;
 G_dir = 0.0;
 % Initial condition
-x_0 = [Theta0(1); Theta1(1)];
-dx_0 = [dTheta0(1); dTheta1(1)];
+x_0 = [1e-3; 1e-3];
+dx_0 = [0; 0];
+% x_0 = [Theta0(1); Theta1(1)];
+% dx_0 = [dTheta0(1); dTheta1(1)];
 
 %% Simulate full dynamic system
 out = sim('dynamics');
@@ -104,6 +108,11 @@ scatter(Gamma,del_endpt,30,[0 0.4470 0.7410],'filled')
 grid on
 xlabel('\phi (rad)')
 ylabel('\Delta p_{e,B} (m)')
+% Plot linear fit
+% hold on
+% plot([0,3*pi/4],[0,0.02*3*pi/4],'r')
+% plot([0,-3*pi/4],[0,0.02*3*pi/4],'r')
+% hold off
 % % Fit quadratic to error
 % coeffs = polyfit(Gamma,del_endpt,2);
 % hold on

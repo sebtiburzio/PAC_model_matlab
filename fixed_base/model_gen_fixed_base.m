@@ -1,3 +1,6 @@
+clear
+clear global
+
 %%
 % Constant parameters
 syms m_L m_E L D real % m_L - total mass of cable, m_E - mass of weighted end

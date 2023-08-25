@@ -1,5 +1,7 @@
 %%
 clear
+clear global
+rmpath('../fixed_base/automatically_generated')
 addpath('automatically_generated')
 
 %% Prep data

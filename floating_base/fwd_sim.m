@@ -1,5 +1,7 @@
 %% Init
 clear
+clear global
+rmpath('../fixed_base/automatically_generated')
 addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
 global beta_obj D

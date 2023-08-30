@@ -10,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/orange_short_unweighted.mat')
+load('../object_parameters/black_short_unweighted.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -165,7 +165,7 @@ lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
 radial_constraint = 2.0; % Centered on Joint1
 for phig = -pi/2:pi/12:3*pi/4
-    goal = [0.0; 0.4; phig];
+    goal = [0.0; 0.45; phig];
     goals = [goals, goal];
    
     % Run optimisation with default q_0

@@ -8,7 +8,7 @@ global beta_obj D
 
 %%
 % Load predefined object parameters
-load('../object_parameters/orange_weighted.mat')
+load('../object_parameters/black_weighted.mat')
 
 %%
 % % Manually defined object parameters (overwrites loaded parameters)
@@ -41,12 +41,20 @@ q_ev = out.q_ev; % if sim doesn't finish: q_ev = load('q_ev.mat');
 %plot_robot(q_ev)
 
 %% Plot Theta evolution
-plot(ts,Theta0)
+% plot(ts,Theta0,'LineWidth',2)
 hold on
-plot(q_ev.Time,q_ev.Data(:,1))
-plot(ts,Theta1)
-plot(q_ev.Time,q_ev.Data(:,2))
+plot(q_ev.Time,q_ev.Data(:,1),'LineWidth',2)
+% plot(ts,Theta1,'LineWidth',2)
+plot(q_ev.Time,q_ev.Data(:,2),'LineWidth',2)
 hold off
+xlabel('t (s)')
+ylabel('\theta (rad)')
+legend('\theta_0 (measured)','\theta_0 (simulated)', '\theta_1 (measured)','\theta_1 (simulated)')
+ax = gca;
+ax.FontSize = 24;
+
+%% Make full size and check xlim before export
+exportgraphics(ax,'D:\Study\Thesis\Report\images\dynamic_id\full_dyn_orange_weighted_theta_ev.eps')
 
 %% Save dynamic evolution output
 n_step = q_ev.time(end)*30;
@@ -67,11 +75,18 @@ for i = ss_range
     hold on
     plot_config(q_ev.Data(end,1), q_ev.Data(end,2), 1,  Gamma(i))
     hold on
-    scatter(X_mid(i)*cos(Gamma(i))+Z_mid(i)*sin(Gamma(i)),-X_mid(i)*sin(Gamma(i))+Z_mid(i)*cos(Gamma(i)),100,[0.4660 0.6740 0.1880],'x')
-    scatter(X_end(i)*cos(Gamma(i))+Z_end(i)*sin(Gamma(i)),-X_end(i)*sin(Gamma(i))+Z_end(i)*cos(Gamma(i)),100,[0 0.4470 0.7410],'x')
+    scatter(X_mid(i)*cos(Gamma(i))+Z_mid(i)*sin(Gamma(i)),-X_mid(i)*sin(Gamma(i))+Z_mid(i)*cos(Gamma(i)),150,[0.4660 0.6740 0.1880],'x','LineWidth',1)
+    scatter(X_end(i)*cos(Gamma(i))+Z_end(i)*sin(Gamma(i)),-X_end(i)*sin(Gamma(i))+Z_end(i)*cos(Gamma(i)),150,[0 0.4470 0.7410],'x','LineWidth',1)
 end
 xlabel('x_B (m)')
 ylabel('y_B (m)')
+xticks(-0.6:0.1:0.6)
+ax = gca;
+ax.FontSize = 26;
+
+%% 
+exportgraphics(ax,'D:\Study\Thesis\Report\images\static_ID_assessment\orange_weighted_static_eqs.eps')
+
 %% Plot steady state comparison - fixed base frame
 [~, ss_range] = min(abs(Gamma-[3*pi/4 pi/2 pi/4 0 -pi/4 -pi/2 -3*pi/4])); % Select indexes in Gamma closest to desired plot angles
 % [~, ss_range] = min(abs(Gamma-(6:11)*pi/12));
@@ -89,8 +104,8 @@ end
 
 %% Visualise steady state endpoint error
 del_endpt = zeros(length(Gamma),1);
-figure
-hold on
+% figure
+% hold on
 for i = 1:length(Gamma)
     G_dir = -Gamma(i); % Note- use -ve Gamma since since data is robot angle
     out = sim('ss_solver');
@@ -101,18 +116,25 @@ for i = 1:length(Gamma)
 %     scatter(endpt_model(1), endpt_model(2), 20, [0 0.4470 0.7410], 'filled')
 %     plot([endpt_model(1) X_end(i)], [endpt_model(2) Z_end(i)],'k:')
 end
-axis equal
-hold off 
+% axis equal
+% hold off 
 figure
-scatter(Gamma,del_endpt,30,[0 0.4470 0.7410],'filled')
+scatter(Gamma,del_endpt,60,[0 0.4470 0.7410],'filled')
 grid on
+box on
+xlim([-pi, pi])
+xticks(-pi:pi/4:pi)
+xticklabels({'-\pi','-3\pi/4','-\pi/2','-\pi/4','0','\pi/4','\pi/2','3\pi/4','\pi'})
 xlabel('\phi (rad)')
-ylabel('\Delta p_{e,B} (m)')
-% Plot linear fit
-% hold on
-% plot([0,3*pi/4],[0,0.02*3*pi/4],'r')
-% plot([0,-3*pi/4],[0,0.02*3*pi/4],'r')
-% hold off
+ylabel('\Delta p_e (m)')
+ax=gca;
+ax.FontSize=26;
+
+%% Plot linear fit
+hold on
+plot([0,3*pi/4],[0,0.0275*3*pi/4],'Color',[1.0 0.5 0],'LineWidth',2)
+plot([0,-3*pi/4],[0,0.0275*3*pi/4],'Color',[1.0 0.5 0],'LineWidth',2)
+hold off
 % % Fit quadratic to error
 % coeffs = polyfit(Gamma,del_endpt,2);
 % hold on

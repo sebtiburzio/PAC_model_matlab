@@ -30,12 +30,6 @@ alpha = theta_0*v + 0.5*theta_1*v^2;
 fk_fcn(1) = -L*int(sin(alpha),v, 0, s); % x. when theta=0, x=0.
 fk_fcn(2) = -L*int(cos(alpha),v, 0, s); % z. when theta=0, z=-L. 
 
-% FK of midpoint and endpoint in base frame (for curvature IK)
-%fk_mid_fixed = subs(fk, s, 0.5);
-%fk_end_fixed = subs(fk, s, 1);
-%J_mid_fixed = jacobian(fk_mid_fixed,[theta_0; theta_1]);
-%J_end_fixed = jacobian(fk_end_fixed,[theta_0; theta_1]);
-
 % 3DOF floating base 
 rot_phi = [cos(phi) sin(phi); % +ve rotations around robot base Y axis (CW in XZ plane)
           -sin(phi) cos(phi)];                  
@@ -76,8 +70,8 @@ fclose(fid);
 tic
 
 % Energy
-% TODO - add base mass
-U = m_E*int(subs(sin(gamma)*fk_fcn(1) + cos(gamma)*fk_fcn(2),s,1),d,-1/2,1/2); 
+U = 0.08*int(subs(sin(gamma)*fk_fcn(1) + cos(gamma)*fk_fcn(2),s,0),d,-1/2,1/2); % Base mass currently just FT sensor flange mass. Should be combined with cable clamp and adapter (these are currently included in cable weight).
+U = U + m_E*int(subs(sin(gamma)*fk_fcn(1) + cos(gamma)*fk_fcn(2),s,1),d,-1/2,1/2); 
 for i = 0:num_masses-1
     U = U + (m_L/num_masses)*int(subs(sin(gamma)*fk_fcn(1) + cos(gamma)*fk_fcn(2),s,i/num_masses + 1/(num_masses*2)),d,-1/2,1/2);
 end
@@ -114,9 +108,10 @@ fclose(fid);
 % Inertia matrix
 tic
 
-% TODO - add base mass
+J = jacobian(subs(fk_fcn,s, 0),[theta_0; theta_1; x; z; phi]);
+B_fcn = 0.08*int(J'*J, d, -1/2, 1/2); % Base mass currently just FT sensor flange mass. Should be combined with cable clamp and adapter (these are currently included in cable weight).
 J = jacobian(subs(fk_fcn,s, 1),[theta_0; theta_1; x; z; phi]);
-B_fcn = m_E*int(J'*J, d, -1/2, 1/2);
+B_fcn = B_fcn + m_E*int(J'*J, d, -1/2, 1/2);
 for i = 0:num_masses-1
     J = jacobian(subs(fk_fcn, s, i/num_masses + 1/(num_masses*2)),[theta_0; theta_1; x; z; phi]);
     B_fcn = B_fcn + (m_L/num_masses)*int(J'*J, d, -1/2, 1/2);

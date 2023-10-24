@@ -14,7 +14,8 @@ hold on
 plot(xy_c(:,1),xy_c(:,2), Color=[1.0 1.0-alpha*0.5 1.0-alpha*1.0], LineWidth=3)
 scatter(xy_c(11,1),xy_c(11,2), 20, [0.4660 0.6740 0.1880], 'filled')
 scatter(xy_c(end,1),xy_c(end,2), 20, [0 0.4470 0.7410], 'filled')
-xlim([xy_c(1,1)-p_vals(3)-0.1,xy_c(1,1)+p_vals(3)+0.1])
+xlim([xy_c(1,1)-p_vals(3)/2,xy_c(1,1)+p_vals(3)/2])
+% ylim([-0.1,1.0])
 axis equal
 grid on
 hold off

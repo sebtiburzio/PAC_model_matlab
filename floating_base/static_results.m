@@ -8,10 +8,10 @@ addpath('automatically_generated')
 t = tiledlayout(2,3,'TileSpacing','Tight');
 
 %%
-Endpt_Meas = [X_end_meas(1:90) Z_end_meas(1:90)]';
-Endpt_Goals = [Goal_X(1:90) Goal_Z(1:90)]';
-Endpt_Sols = [Endpt_Sol_X(1:90) Endpt_Sol_Z(1:90)]';
-ts = ts(1:90);
+Endpt_Meas = [X_end_meas(:) Z_end_meas(:)]';
+Endpt_Goals = [Goal_X(:) Goal_Z(:)]';
+Endpt_Sols = [Endpt_Sol_X(:) Endpt_Sol_Z(:)]';
+ts = ts(:);
 nX = 15;
 nY = length(ts)/nX;
 
@@ -23,7 +23,43 @@ zgrid_heatmap = 0.0:0.1:0.1*nY;
 
 plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 
-%% Plots
+%% Statistics
+% mean(model_error,'all')
+% median(model_error,'all')
+% mean(endpt_error,'all')
+% median(endpt_error,'all')
+load('./data_in/0830/endpt_error_means.mat')
+ob_cats = categorical({'OB1','OB2','OB3','OB5'});
+ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
+b = bar(ob_cats,endpt_error_means);
+b(1).FaceColor = [0.6350 0.0780 0.1840];
+b(2).FaceColor = [0.8500 0.3250 0.0980];
+b(3).FaceColor = [0.9290 0.6940 0.1250];
+b(4).FaceColor = [0 0.262 0.5];
+b(5).FaceColor = [0 0.4470 0.7410];
+b(6).FaceColor = [0.3010 0.7450 0.9330];
+ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
+ax = gca;
+set(ax, 'FontSize', 16)
+set(ax, 'TickLabelInterpreter', 'latex')
+grid on
+box on
+
+bar_labels=categorical({'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+bar_labels=reordercats(bar_labels,{'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+hold on
+bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
+bh(2) = bar(nan,nan,'FaceColor',[0.8500 0.3250 0.0980]);
+bh(3) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
+bh(4) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
+bh(5) = bar(nan,nan,'FaceColor',[0 0.4470 0.7410]);
+bh(6) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
+legend(bh, string(bar_labels),'Location','eastoutside')
+l = findobj(gcf, 'Type', 'legend');
+set(l, 'Interpreter', 'latex')
+set(gcf, 'Position', [303 495 1115 331])
+
+%% Heatmap plots
 topplt = 3; % Model comparison, control/nophicost/phicost, 1/2/3
 btmplt = 6; % Measured comparison, control/nophicost/phicost, 4/5/6
 % Model endpoints compared to goal points
@@ -41,7 +77,10 @@ for i = 1:length(ts)
 end
 scatter(Endpt_Sols(1,:),Endpt_Sols(2,:),20,plot_clr,'filled');
 ax = gca;
-ax.FontSize = 14;
+set(ax, 'FontSize', 14)
+set(ax, 'TickLabelInterpreter', 'latex')
+grid on
+box on
 
 % Measured endpoints compared to goal points (nexttile 4,5,6)
 nexttile(btmplt)
@@ -52,28 +91,45 @@ xlim([-0.75,0.75]);
 xticks(-0.6:0.2:0.6)
 xticklabels('auto')
 ylim([0 0.1*nY]);
-xlabel('x_B (m)')
+xlabel('$x_B$ (m)','Interpreter','latex')
 hold on
 for i = 1:length(ts)
     plot([Endpt_Meas(1,i) Endpt_Sols(1,i)], [Endpt_Meas(2,i) Endpt_Sols(2,i)],':','color',plot_clr,'linewidth',1.5)
 end
 scatter(X_end_meas(:),Z_end_meas(:),20,plot_clr,'filled');
 ax = gca;
-ax.FontSize = 14;
+set(ax, 'FontSize', 14)
+set(ax, 'TickLabelInterpreter', 'latex')
+grid on
+box on
 
+% clearvars -except t   % in between importing different datasets
 %% Only ylabel on leftmost plots
 nexttile(1)
-ylabel('y_B (m)')
+ylabel('$y_B$ (m)','Interpreter','latex')
 nexttile(4)
-ylabel('y_B (m)')
+ylabel('$y_B$ (m)','Interpreter','latex')
 
 %% Only colourbar on rightmost plots
 nexttile(3)
+ax = gca;
+set(ax, 'FontSize', 14)
+set(ax, 'TickLabelInterpreter', 'latex')
+box on
 cax = colorbar;
-cax.Label.String = '\Delta p_e (m)';
+cax.Label.String = '$\Delta p_e$ (m)';
+cax.Label.Interpreter = 'latex';
+set(cax, 'TickLabelInterpreter', 'latex')
+caxis([0.0 0.2])
 nexttile(6)
+ax = gca;
+set(ax, 'FontSize', 14)
+set(ax, 'TickLabelInterpreter', 'latex')
+box on
 cax = colorbar;
-cax.Label.String = '\Delta p_e (m)';
+cax.Label.String = '$\Delta p_e$ (m)';
+cax.Label.Interpreter = 'latex';
+set(cax, 'TickLabelInterpreter', 'latex')
 caxis([0.0 0.2])
 
 %%
@@ -100,63 +156,23 @@ endpt_error = reshape(vecnorm(Endpt_Goals - Endpt_Meas),[nX,nY])';
 
 plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 
-%% Plots
-% Model endpoints compared to goal points
-plot_clr = [1 1 1];
-subplot(2,1,1)
-pcolor(xgrid_heatmap,zgrid_heatmap,[model_error zeros(6,1); zeros(1,15) 0])
-% colormap(gca,GR_cmap);
-axis equal
-xlim([-0.75,0.75]);
-ylim([0 0.6]);
-ylabel('y_B (m)')
-cax = colorbar;
-cax.Label.String = '\Delta p_e (modelled) (m)';
-caxis([0.0 0.2])
-hold on
-for i = 1:length(Sequence)
-    plot([model_endpts(1,i) Goals(1,i)], [model_endpts(2,i) Goals(2,i)],'--','color',plot_clr,'linewidth',1.5)
-end
-scatter(model_endpts(1,:),model_endpts(2,:),20,plot_clr,'filled');
-
-% Measured endpoints compared to goal points 
-subplot(2,1,2)
-pcolor(xgrid_heatmap,zgrid_heatmap,[endpt_error zeros(6,1); zeros(1,15) 0])
-% colormap(gca,GR_cmap);
-axis equal
-xlim([-0.75,0.75]);
-ylim([0 0.6]);
-xlabel('x_B (m)')
-ylabel('y_B (m)')
-cax = colorbar;
-cax.Label.String = '\Delta p_e (measured) (m)';
-caxis([0.0 0.2])
-hold on
-for i = 1:length(Sequence)
-    plot([X_end_meas(i) model_endpts(1,i)], [Z_end_meas(i) model_endpts(2,i)],':','color',plot_clr,'linewidth',1.5)
-end
-scatter(X_end_meas(:),Z_end_meas(:),20,plot_clr,'filled');
-
 %% Orientation Experiment
 % Note the names are all messed up, Goal_Phi is the goal for the tip angle (alpha), and Base_angle is the measured tip angle. Sad.
 
 % Angle error plot
 figure
-scatter(-Goal_Phi(1:13),Goal_Phi(1:13)-Base_angle(1:13),60,[0 0.4470 0.7410],'filled')
-xlabel('\psi_{g,B^\prime} (rad)')
-xlim([-1.7,1.7])
-xticks(-pi:pi/4:pi)
-xticklabels({'-\pi','-3\pi/4','-\pi/2','-\pi/4','0','\pi/4','\pi/2','3\pi/4','\pi'})
-ylabel('\Delta \psi_{e,B^\prime} (rad)')
-ylim([-0.15,0.3])
-
+scatter(-Goal_Phi(1:13).*180/pi,(Goal_Phi(1:13)-Base_angle(1:13)).*180/pi,60,[0 0.4470 0.7410],'filled') % Plot -ve Goal_Phi on x axis because in the report rotation opposite
+xlabel('$\psi_{g,B^\prime}$ (deg)','Interpreter','latex')
+xlim([-1.7*180/pi,1.7*180/pi])
+xticks(-180:45:180)%xticks(-pi:pi/4:pi)
+xticklabels({'-180','-135','-90','-45','0','45','90','135','180'})%xticklabels({'$-\pi$','$-3\pi/4$','$-\pi/2$','$-\pi/4$','0','$\pi/4$','$\pi/2$','$3\pi/4$','$\pi$'})
+ylabel('$\Delta \psi_{e,B^\prime}$ (deg)','Interpreter','latex')
+ylim([-0.15*180/pi,0.3*180/pi])
 grid on
 box on
 ax = gca;
-ax.FontSize = 24;
-
-%%
-exportgraphics(ax,'D:\Study\Thesis\Report\images\orientation_analysis\orange_orientation_error.eps')
+set(ax, 'FontSize', 36)
+set(ax, 'TickLabelInterpreter', 'latex')
 
 %% Angle visualisation
 figure
@@ -171,3 +187,18 @@ hold off
 
 %% Trace of endpoint, normalised to goal at (0,0)
 plot(X_end_meas(1:13),Z_end_meas(1:13)-0.45)
+
+%% Plot an animated interpolation between solutions for defense presensation
+q_int = interp1([0;1],[q_start; q_end],linspace(0,1,40)');
+fig = figure;
+fig.Position = [100 100 400 600];
+for i = 1:length(q_int)
+    q_i = q_int(i,:);
+    scatter(-0.3,0.3,100,'kx','LineWidth',1.5)
+    hold on 
+    plot_config(q_i',1)
+    box on
+    drawnow
+    ax = gca;
+    exportgraphics(ax,'./frames/' + string(i) + '.png','Resolution',300)
+end

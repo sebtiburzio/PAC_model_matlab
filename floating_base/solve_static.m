@@ -10,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/black_short_weighted.mat')
+load('../object_parameters/black_weighted.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -36,8 +36,8 @@ radial_constraint = 0.5; % Centered on Joint1
 
 %%
 % Position only
-q_0 = [1e-1; 1e-1; -0.1; 0.5; -2*pi/4];
-goal = [0; 0];
+q_0 = [1e-3; 1e-3; 0; 0; 0];
+goal = [-0.3; 0.3];
 [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon)
 goals = goal;
 results = exitflag;
@@ -62,15 +62,14 @@ curv = [];
 path = [];
 results = [];
 for i = 0:9
-    % goal = [0.2+0.07*i; 0.333];
-    goal = [0.4; 0.1+0.07*i];
+    goal = [0.3-0.6/9*i; 0.3];
     goals = [goal, goals];
     [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
     results = [results exitflag];
     path = [path, [q_st(3); q_st(4); q_st(5)]];
     curv = [curv, [q_st(1); q_st(2)]];
     q_0 = q_st;
-    plot_config(q_st,i/10+0.1)
+    plot_config(q_st,1)%i/10+0.1)
     hold on
 end
 hold off
@@ -116,7 +115,7 @@ for zg = zg_start:zg_spacing:zg_end
         % Run optimisation with default q_0
         q_0 = [1e-3;1e-3;0.0;0.8;0];
         [q_st,fval,exitflag] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
-       % Run optimisation with random q_0s to try to improve
+        % Run optimisation with random q_0s to try to improve
         for i = 0:10
             q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);zg+p_vals(3);0];
             [q_st_n,fval_n,exitflag_n] = fmincon(@f,q_0,[],[],[],[],lb,ub,@nonlcon);
@@ -145,13 +144,12 @@ for zg = zg_start:zg_spacing:zg_end
     th = 0:pi/50:2*pi;
     xunit = radial_constraint * cos(th);
     yunit = radial_constraint * sin(th) + 0.333;
-    h = plot(xunit, yunit,'r');
+    plot(xunit, yunit,'r');
     saveas(gcf,string(zg*100))
 end
-% plot(goals(1,:),goals(2,:),Color=[1.0 0.75 0.75])
 hold off
 
-%%
+%% Export the problem configuration and solutions
 writematrix([path', goals', endpts'],'sequence.csv');
 save('vars','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'endpts', 'lb', 'ub', 'radial_constraint');
 
@@ -196,10 +194,10 @@ yline([lb(4) ub(4)],'r')
 th = 0:pi/50:2*pi;
 xunit = radial_constraint * cos(th);
 yunit = radial_constraint * sin(th) + 0.333;
-h = plot(xunit, yunit,'r');
+plot(xunit, yunit,'r');
 hold off
 
-%%
+%% Export the problem configuration and solutions
 writematrix([path', goals'],'full_range_centered.csv');
 save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
@@ -210,23 +208,25 @@ save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'l
 box on
 xlim([-0.75,0.75])
 ylim([-0.05,0.85])
-xlabel('x_B (m)')
-% ylabel('y_B (m)')
-yticklabels('')
+xlabel('$x_B$ (m)','Interpreter','latex')
+ylabel('$y_B$ (m)','Interpreter','latex')
+yticklabels('auto')
 ax = gca;
-ax.FontSize = 26;
-exportgraphics(ax,'D:\Study\Thesis\Report\images\endpoint_sols\black_weighted_nocost_15.png')
+set(ax, 'FontSize', 28)
+set(ax, 'TickLabelInterpreter', 'latex')
+%exportgraphics(ax,'D:\Study\Thesis\Report\images\endpoint_sols\orange_weighted_phicost\35.eps')
 
 %% Format solution figures for report - orientation
 xlim([-0.5,0.5])
 ylim([0,0.9])
 xticks(-0.6:0.2:0.6)
 yticks(0:0.1:0.9)
-xlabel('x_B (m)')
-ylabel('y_B (m)')
+xlabel('$x_B$ (m)','Interpreter','latex')
+ylabel('$y_B$ (m)','Interpreter','latex')
 ax = gca;
-ax.FontSize = 26;
-exportgraphics(ax,'D:\Study\Thesis\Report\images\orientation_analysis\orange_orientation_solutions.eps')
+set(ax, 'FontSize', 24)
+set(ax, 'TickLabelInterpreter', 'latex')
+%exportgraphics(ax,'D:\Study\Thesis\Report\images\orientation_analysis\orange_orientation_solutions.eps')
 
 %%
 % Plot from saved single result
@@ -248,13 +248,13 @@ for i = 1:length(results)
     q_i = [curv(:,i); path(:,i)];
     scatter(goals(1,i),goals(2,i),50,'kx')
     hold on
-    plot_config(q_i,goals(2,i)/goals(2,end))
+    plot_config(q_i,1)%goals(2,i)/goals(2,end))
     hold on
     endpt = fk_fcn(p_vals, q_i, 1, 0);
     endpts = [endpts endpt];
     plot([endpt(1) goals(1,i)], [endpt(2) goals(2,i)],'k:')
 end
-plot(goals(1,:),goals(2,:),Color=[0.75 0.75 1.0])
+%plot(goals(1,:),goals(2,:),Color=[0.75 0.75 1.0])
 % plot(end_pos_x,end_pos_z,Color=[0.3010 0.7450 0.9330])
 hold off
 
@@ -268,40 +268,6 @@ plot(end_pos_x, end_pos_z, Color=[0.3010 0.7450 0.9330])
 axis equal
 xlim([-0.75,0])
 hold off
-
-%%
-% Plot joined LHS and RHS model and real endpt paths
-clear
-load('0724\black_cable\k000100To000000Ti000000\black_grid_horiz_LHS.mat')
-endpts = [];
-for i = 1:length(results)
-    q_i = [curv(:,i); path(:,i)];
-    endpt = fk_fcn(p_vals, q_i, 1, 0);
-    endpts = [endpts endpt];
-end
-endpts = (flip(endpts'))';
-load('0724\black_cable\k000100To000000Ti000000\black_grid_horiz_RHS.mat')
-for i = 1:length(results)
-    q_i = [curv(:,i); path(:,i)];
-    endpt = fk_fcn(p_vals, q_i, 1, 0);
-    endpts = [endpts endpt];
-end
-LHS_meas = readmatrix("0724\black_cable\k000100To000000Ti000000\black_grid_horiz_LHS_measurements.csv");
-RHS_meas = readmatrix("0724\black_cable\k000100To000000Ti000000\black_grid_horiz_RHS_measurements.csv");
-figure
-plot(endpts(1,:),endpts(2,:))
-hold on
-scatter(endpts(1,:),endpts(2,:), 10, [0 0.4470 0.7410], 'filled')
-plot([flip(LHS_meas(:,6)); RHS_meas(:,6)],[flip(LHS_meas(:,7)); RHS_meas(:,7)],Color=[0.3010 0.7450 0.9330])
-axis equal
-xlim([-0.75,0.75])
-hold off
-
-%%
-% OUTPUT
-
-writematrix(path','Xn494Yn200Z662P145.csv');
-save('Xn043Yn200Z847P154','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
 %%
 % OPTIMISATION FUNCTION DEFINITIONS

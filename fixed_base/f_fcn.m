@@ -22,5 +22,4 @@ B = B_fcn(p_vals,x);
 G = Gv_fcn(p_vals,x,G_dir);
 C = C_fcn(p_vals,x,dx);
 
-% ddx = B\(-G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);
 ddx = B\(-C*dx -G*G_Scale -K*(x-Theta_bar) -D*dx + [0; 0]);

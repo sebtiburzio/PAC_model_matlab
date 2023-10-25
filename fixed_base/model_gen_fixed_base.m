@@ -137,61 +137,61 @@ fid  = fopen('automatically_generated/C_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
-%%
-% Factorisation by masses
-E = B_fcn*ddtheta + C_fcn*dtheta + G_fcn;
-Y = jacobian(E,[m_L;m_E]);
-
-%%
-% Factor out m_L for identification
-dE_dmL = diff(E,m_L);
-E_mL_0 = subs(E,m_L,0);
-
-matlabFunction(dE_dmL,'File','automatically_generated/dE_dmL','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
-
-fid  = fopen('automatically_generated/dE_dmL.m','r');
-f=fread(fid,'*char')';
-fclose(fid);
-f = strrep(f,'fresnelc','fresnelc_approx');
-f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/dE_dmL.m','w');
-fprintf(fid,'%s',f);
-fclose(fid);
-
-matlabFunction(E_mL_0,'File','automatically_generated/E_mL_0','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
-
-fid  = fopen('automatically_generated/E_mL_0.m','r');
-f=fread(fid,'*char')';
-fclose(fid);
-f = strrep(f,'fresnelc','fresnelc_approx');
-f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/E_mL_0.m','w');
-fprintf(fid,'%s',f);
-fclose(fid);
-
-%%
-% Factor out m_E for identification
-dE_dmE = diff(E,m_E);
-E_mE_0 = subs(E,m_E,0);
-
-matlabFunction(dE_dmE,'File','automatically_generated/dE_dmE','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
-
-fid  = fopen('automatically_generated/dE_dmE.m','r');
-f=fread(fid,'*char')';
-fclose(fid);
-f = strrep(f,'fresnelc','fresnelc_approx');
-f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/dE_dmE.m','w');
-fprintf(fid,'%s',f);
-fclose(fid);
-
-matlabFunction(E_mE_0,'File','automatically_generated/E_mE_0','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
-
-fid  = fopen('automatically_generated/E_mE_0.m','r');
-f=fread(fid,'*char')';
-fclose(fid);
-f = strrep(f,'fresnelc','fresnelc_approx');
-f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/E_mE_0.m','w');
-fprintf(fid,'%s',f);
-fclose(fid);
+% %%
+% % Factorisation by masses
+% E = B_fcn*ddtheta + C_fcn*dtheta + G_fcn;
+% Y = jacobian(E,[m_L;m_E]);
+% 
+% %%
+% % Factor out m_L for identification
+% dE_dmL = diff(E,m_L);
+% E_mL_0 = subs(E,m_L,0);
+% 
+% matlabFunction(dE_dmL,'File','automatically_generated/dE_dmL','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
+% 
+% fid  = fopen('automatically_generated/dE_dmL.m','r');
+% f=fread(fid,'*char')';
+% fclose(fid);
+% f = strrep(f,'fresnelc','fresnelc_approx');
+% f = strrep(f,'fresnels','fresnels_approx');
+% fid  = fopen('automatically_generated/dE_dmL.m','w');
+% fprintf(fid,'%s',f);
+% fclose(fid);
+% 
+% matlabFunction(E_mL_0,'File','automatically_generated/E_mL_0','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
+% 
+% fid  = fopen('automatically_generated/E_mL_0.m','r');
+% f=fread(fid,'*char')';
+% fclose(fid);
+% f = strrep(f,'fresnelc','fresnelc_approx');
+% f = strrep(f,'fresnels','fresnels_approx');
+% fid  = fopen('automatically_generated/E_mL_0.m','w');
+% fprintf(fid,'%s',f);
+% fclose(fid);
+% 
+% %%
+% % Factor out m_E for identification
+% dE_dmE = diff(E,m_E);
+% E_mE_0 = subs(E,m_E,0);
+% 
+% matlabFunction(dE_dmE,'File','automatically_generated/dE_dmE','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
+% 
+% fid  = fopen('automatically_generated/dE_dmE.m','r');
+% f=fread(fid,'*char')';
+% fclose(fid);
+% f = strrep(f,'fresnelc','fresnelc_approx');
+% f = strrep(f,'fresnels','fresnels_approx');
+% fid  = fopen('automatically_generated/dE_dmE.m','w');
+% fprintf(fid,'%s',f);
+% fclose(fid);
+% 
+% matlabFunction(E_mE_0,'File','automatically_generated/E_mE_0','Vars',{p,theta,dtheta,ddtheta}); % creating the MatLab function
+% 
+% fid  = fopen('automatically_generated/E_mE_0.m','r');
+% f=fread(fid,'*char')';
+% fclose(fid);
+% f = strrep(f,'fresnelc','fresnelc_approx');
+% f = strrep(f,'fresnels','fresnels_approx');
+% fid  = fopen('automatically_generated/E_mE_0.m','w');
+% fprintf(fid,'%s',f);
+% fclose(fid);

@@ -1,6 +1,6 @@
 # PAC_model_matlab
 
-This repository contains Matlab code relating to my MSc Robotics [thesis](https://repository.tudelft.nl/islandora/object/uuid%3A7f543ce2-b7a5-456c-ab7b-81171c353de2?collection=education)[^1] on manipulation of deformable linear objects using Affine Curvature modelling.
+This repository contains Matlab code relating to my MSc Robotics [thesis](https://repository.tudelft.nl/islandora/object/uuid%3A7f543ce2-b7a5-456c-ab7b-81171c353de2?collection=education) on manipulation of deformable linear objects using Affine Curvature modelling.[^1]
 
 See [here](https://github.com/sebtiburzio/PAC_model_matlab) for the code dealing with processing the data recorded in the experiments as well as a less developed Python implementation of the model using Sympy.
 
@@ -22,9 +22,12 @@ Also the z-coordinate of the forward kinematics is negated so that at 0 curvatur
 
 ### fwd_sim.m
 
-Interface for forward simulation of the dynamic EOM, which are implemented in `f_fcn.m` and `dynamics.slx`. 
+Framework for forward simulation of the dynamic EOM, which are implemented in `f_fcn.m` and `dynamics.slx`. 
 
 Using the variable gravitational field direction, it is also possible to use this model to simulate the equilibrium state of the object when held in different orientations. This approach is used extensively for steady state comparisons; `fss_fcn.m` and `ss_solver.slx` implement simplified dynamics allowing much faster determination of the equilibrium by forward simulation.
+
+<img src="https://github.com/sebtiburzio/PAC_model_matlab/assets/95340175/58d2dc43-d4e2-4572-8ead-384c175d8b2e" height="330">
+<img src="https://github.com/sebtiburzio/PAC_model_matlab/assets/95340175/032b2827-417c-4a03-b66c-cf0406c78b72" height="330">
 
 ### param_id.m & param_id_static.m
 
@@ -44,9 +47,13 @@ In the full dynamic model input force and torque at the base is applied as the t
 
 **Note:** When simulating the model the solver may hang at some stage, probably due to hitting a singularity (to be investigated). In this case, the state evolution will still be saved in `q_ev.mat` if the execution is interrupted.
 
+https://github.com/sebtiburzio/PAC_model_matlab/assets/95340175/1fb80a96-2ca4-42a0-a4a4-adbc72e858b8
+
 ### solve_static.m
 
 Examples of setting up nonlinear optimisation problems to generate manipulator solutions for steady state control of the object endpoint position and orientation. 
+
+https://github.com/sebtiburzio/PAC_model_matlab/assets/95340175/9968affd-c4e2-4f4b-82fa-2cf3014d43c5
 
 ## Object Properties
 The object properties determined through the parameter identification experiments are saved in the `object_parameters` directory, and should be loaded in the script initialisation. There are two sets: those in the main directory were determined with the 2 stage process (k and theta_bar from static data, then beta from dynamic data), while those in the sub directory `full_dynamic_id` were determined from dynamic data only.

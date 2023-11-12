@@ -8,7 +8,7 @@ global beta_obj D
 
 %%
 % Load predefined object parameters
-load('../object_parameters/black_weighted.mat')
+load('../object_parameters/black_unweighted.mat')
 % load('../object_parameters/full_dynamic_id/black_weighted_dyn.mat')
 
 %%
@@ -36,7 +36,7 @@ global G_Scale G_dir
 G_Scale = 1.0;
 G_dir = 0.0;
 % Initial condition
-x_0 = [1e-3;1e-3; 0; 0; 0];
+x_0 = [-0.34; 2.14; 0; 0; -0.06];
 dx_0 = [0; 0; 0; 0; 0];
 
 %% For comparing to imported measured dynamic evolution
@@ -145,5 +145,7 @@ title('j_Phi')
 q_ev_res = resample(q_ev,linspace(0,q_ev.Time(end),q_ev.Time(end)/0.001));
 save('q_ev');
 save('q_ev_res');
-writematrix([q_ev_res.Data(:,3), q_ev_res.Data(:,4), q_ev_res.Data(:,5)],'trajectory.csv','Delimiter','tab')
-writematrix([q_ev_res.Data(:,8), q_ev_res.Data(:,9), q_ev_res.Data(:,10)],'trajectory_vel.csv','Delimiter','tab')
+t_start = 5000;
+t_end = 20000;
+writematrix([q_ev_res.Data(t_start:t_end,3), q_ev_res.Data(t_start:t_end,4), q_ev_res.Data(t_start:t_end,5)],'trajectory.csv','Delimiter','tab')
+writematrix([q_ev_res.Data(t_start:t_end,8), q_ev_res.Data(t_start:t_end,9), q_ev_res.Data(t_start:t_end,10)],'trajectory_vel.csv','Delimiter','tab')

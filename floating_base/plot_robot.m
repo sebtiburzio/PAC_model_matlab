@@ -43,9 +43,10 @@ global p_vals
         grid on
 
         drawnow
-        ax = gca;
-        exportgraphics(ax,'./frames/' + string(i_t) + '.png','Resolution',300)
-        pause(0.01)
+        % Export frames for animation
+        % ax = gca;
+        % exportgraphics(ax,'./frames/' + string(i_t) + '.png','Resolution',300)
+        pause(0.01) % TODO - use rateControl to plot in real time rate?
 
     end
     

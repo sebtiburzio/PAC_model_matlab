@@ -10,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/black_weighted.mat')
+load('../object_parameters/black_short_unweighted.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -150,7 +150,7 @@ end
 hold off
 
 %% Export the problem configuration and solutions
-writematrix([path', goals', endpts'],'sequence.csv');
+writematrix([path', curv', goals', endpts'],'sequence.csv');
 save('vars','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'endpts', 'lb', 'ub', 'radial_constraint');
 
 %%
@@ -159,6 +159,7 @@ goals = [];
 curv = [];
 path = [];
 results = [];
+endpts=[];
 lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
 radial_constraint = 2.0; % Centered on Joint1
@@ -183,6 +184,8 @@ for phig = -pi/2:pi/12:3*pi/4
     results = [results, exitflag];
     path = [path, [q_st(3); q_st(4); q_st(5)]];
     curv = [curv, [q_st(1); q_st(2)]];
+    endpt = fk_fcn(p_vals, q_st, 1, 0);
+    endpts = [endpts, endpt];
     plot_config(q_st,1);%zg/0.75+0.05)
     hold on
 end
@@ -198,9 +201,104 @@ plot(xunit, yunit,'r');
 hold off
 
 %% Export the problem configuration and solutions
-writematrix([path', goals'],'full_range_centered.csv');
+writematrix([path', curv', goals', endpts'],'sequence.csv');
 save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 
+%%
+% Position and orientation for feedback testing
+goals = [];
+curv = [];
+path = [];
+results = [];
+endpts = [];
+lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+radial_constraint = 0.5; % Centered on Joint1
+for xg = [-0.2, 0, 0.2]
+    goal = [xg; 0.15; 0];
+    goals = [goals, goal];
+   
+    % Run optimisation with default q_0
+    q_0 = [1e-3;1e-3;0.0;0.8;0];
+    [q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon);
+    % % Run optimisation with random q_0s to try to improve
+    % for i = 0:10
+    %     q_0 = [1e-3;1e-3;xg-0.15+i*(0.3/10);0.8;0];
+    %     [q_st_n,fval_n,exitflag_n] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon);
+    %     if fval_n < fval
+    %         q_st = q_st_n;
+    %         fval = fval_n;
+    %         exitflag = exitflag_n;
+    %     end
+    % end
+
+    results = [results, exitflag];
+    path = [path, [q_st(3); q_st(4); q_st(5)]];
+    curv = [curv, [q_st(1); q_st(2)]];
+    endpt = fka_fcn(p_vals, q_st, 1, 0);
+    endpts = [endpts, endpt];
+    plot_config(q_st,1);%zg/0.75+0.05)
+    hold on
+end
+
+% Plot constraints
+hold on
+xline([lb(3) ub(3)],'r')
+yline([lb(4) ub(4)],'r')
+th = 0:pi/50:2*pi;
+xunit = radial_constraint * cos(th);
+yunit = radial_constraint * sin(th) + 0.333;
+plot(xunit, yunit,'r');
+hold off
+
+%%
+% Position and orientation for feedforward demo
+goals = [];
+curv = [];
+path = [];
+results = [];
+endpts = [];
+lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+radial_constraint = 0.6; % Centered on Joint1
+goals = [0.025, 0.10, pi/2;
+         0.025, 0.15, pi/2;
+         0.025, 0.15, pi/4;
+         0.025, 0.15, 0;
+        -0.080, 0.15, 0;
+        -0.080, 0.15, -pi/4;
+        -0.080, 0.15, -pi/2]';
+q_0 = [1e-3;1e-3;0.0;0.8;0];
+for goal = goals
+   
+    [q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon);
+    q_0 = q_st;
+
+    results = [results, exitflag];
+    path = [path, [q_st(3); q_st(4); q_st(5)]];
+    curv = [curv, [q_st(1); q_st(2)]];
+    endpt = fka_fcn(p_vals, q_st, 1, 0);
+    endpts = [endpts, endpt];
+    plot_config(q_st,1);%zg/0.75+0.05)
+    hold on
+end
+
+% Plot hook
+plot([0, -0.08, -0.08, 0.025, 0.025], [0, 0, 0.15, 0.15, 0.11],LineWidth=2,Color=[0.5,0.5,0.5])
+
+% Plot constraints
+hold on
+xline([lb(3) ub(3)],'r')
+yline([lb(4) ub(4)],'r')
+th = 0:pi/50:2*pi;
+xunit = radial_constraint * cos(th);
+yunit = radial_constraint * sin(th) + 0.333;
+plot(xunit, yunit,'r');
+hold off
+
+%% Export the problem configuration and solutions
+writematrix([path', curv', goals', endpts'],'sequence.csv');
+% save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
 %% 
 % PLOTTING
 

@@ -2,7 +2,7 @@
 
 This repository contains Matlab code relating to my MSc Robotics [thesis](https://repository.tudelft.nl/islandora/object/uuid%3A7f543ce2-b7a5-456c-ab7b-81171c353de2?collection=education) on manipulation of deformable linear objects using Affine Curvature modelling.[^1]
 
-See [here](https://github.com/sebtiburzio/PAC_model_matlab) for the code dealing with processing the data recorded in the experiments as well as a less developed Python implementation of the model using Sympy.
+See [here](https://github.com/sebtiburzio/floating_PAC_model) for the code dealing with processing the data recorded in the experiments as well as a less developed Python implementation of the model using Sympy.
 
 There are two models:
 

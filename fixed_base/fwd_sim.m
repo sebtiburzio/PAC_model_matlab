@@ -53,12 +53,12 @@ hold on
 plot(q_ev.Time,[q_ev.Data(:,1) q_ev.Data(:,2)])
 hold off
 xlabel('t (s)','Interpreter','latex')
-ylabel('$\theta$ (rad)','Interpreter','latex')
+ylabel('$\Theta$ (rad)','Interpreter','latex')
 xlim([0 ts(end)])
 ylim([-3 5])
 legend('$\theta_0$ (measured)','$\theta_1$ (measured)','$\theta_0$ (simulated)','$\theta_1$ (simulated)','Interpreter','latex')
 ax = gca;
-set(ax, 'FontSize', 30)
+set(ax, 'FontSize', 32)
 set(ax, 'TickLabelInterpreter', 'latex')
 lines = findobj(gcf, 'Type', 'line');
 for i = 1:length(lines)

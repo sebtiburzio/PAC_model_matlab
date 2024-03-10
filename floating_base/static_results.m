@@ -28,36 +28,57 @@ plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 % median(model_error,'all')
 % mean(endpt_error,'all')
 % median(endpt_error,'all')
-load('./data_in/0830/endpt_error_means.mat')
-ob_cats = categorical({'OB1','OB2','OB3','OB5'});
-ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
-b = bar(ob_cats,endpt_error_means);
-b(1).FaceColor = [0.6350 0.0780 0.1840];
-b(2).FaceColor = [0.8500 0.3250 0.0980];
+
+% Swap to commented lines for original plot including phi cost case (do not try to understand the madness that went into converting the vertical bar plot to horizontal)
+% load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+load('.\data_in\0829-static_wkspaceCD\endpt_error_means_without_phi_cost_case.mat')
+% ob_cats = categorical({'OB1','OB2','OB3','OB5'});
+% ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
+ob_cats = categorical({'OB5','OB3','OB2','OB1'});
+ob_cats = reordercats(ob_cats,{'OB5','OB3','OB2','OB1'});
+% b = bar(ob_cats,endpt_error_means);
+% b(1).FaceColor = [0.6350 0.0780 0.1840];
+% b(2).FaceColor = [0.8500 0.3250 0.0980];
+% b(3).FaceColor = [0.9290 0.6940 0.1250];
+% b(4).FaceColor = [0 0.262 0.5];
+% b(5).FaceColor = [0 0.4470 0.7410];
+% b(6).FaceColor = [0.3010 0.7450 0.9330];
+% b = barh(ob_cats,endpt_error_means_without_phi_cost_case);
+b = barh(flip(ob_cats,2),flip(endpt_error_means_without_phi_cost_case,2));
+b(1).FaceColor = [0.3010 0.7450 0.9330];
+b(2).FaceColor = [0 0.262 0.5];
 b(3).FaceColor = [0.9290 0.6940 0.1250];
-b(4).FaceColor = [0 0.262 0.5];
-b(5).FaceColor = [0 0.4470 0.7410];
-b(6).FaceColor = [0.3010 0.7450 0.9330];
-ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
+b(4).FaceColor = [0.6350 0.0780 0.1840];
+% ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
+xlabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
 ax = gca;
-set(ax, 'FontSize', 16)
+set(ax, 'FontSize', 18)
 set(ax, 'TickLabelInterpreter', 'latex')
 grid on
 box on
 
-bar_labels=categorical({'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
-bar_labels=reordercats(bar_labels,{'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+% bar_labels=categorical({'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+% bar_labels=reordercats(bar_labels,{'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+bar_labels=categorical({'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
+bar_labels=reordercats(bar_labels,{'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
 hold on
-bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
-bh(2) = bar(nan,nan,'FaceColor',[0.8500 0.3250 0.0980]);
-bh(3) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
-bh(4) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
-bh(5) = bar(nan,nan,'FaceColor',[0 0.4470 0.7410]);
-bh(6) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
-legend(bh, string(bar_labels),'Location','eastoutside')
+% bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
+% bh(2) = bar(nan,nan,'FaceColor',[0.8500 0.3250 0.0980]);
+% bh(3) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
+% bh(4) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
+% bh(5) = bar(nan,nan,'FaceColor',[0 0.4470 0.7410]);
+% bh(6) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
+bh(1) = barh(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
+bh(2) = barh(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
+bh(3) = barh(nan,nan,'FaceColor',[0 0.262 0.5]);
+bh(4) = barh(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
+% legend(bh, string(bar_labels),'Location','eastoutside')
+xlim([0,0.25])
+legend(bh, string(bar_labels),'Location','northoutside')
 l = findobj(gcf, 'Type', 'legend');
 set(l, 'Interpreter', 'latex')
-set(gcf, 'Position', [303 495 1115 331])
+% set(gcf, 'Position', [303 495 1115 331])
+set(gcf, 'Position', [833 220 466 611])
 
 %% Heatmap plots
 topplt = 3; % Model comparison, control/nophicost/phicost, 1/2/3
@@ -161,13 +182,13 @@ plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 
 % Angle error plot
 figure
-scatter(-Goal_Phi(1:13).*180/pi,(Goal_Phi(1:13)-Base_angle(1:13)).*180/pi,60,[0 0.4470 0.7410],'filled') % Plot -ve Goal_Phi on x axis because in the report rotation opposite
-xlabel('$\psi_{g,B^\prime}$ (deg)','Interpreter','latex')
-xlim([-1.7*180/pi,1.7*180/pi])
-xticks(-180:45:180)%xticks(-pi:pi/4:pi)
-xticklabels({'-180','-135','-90','-45','0','45','90','135','180'})%xticklabels({'$-\pi$','$-3\pi/4$','$-\pi/2$','$-\pi/4$','0','$\pi/4$','$\pi/2$','$3\pi/4$','$\pi$'})
-ylabel('$\Delta \psi_{e,B^\prime}$ (deg)','Interpreter','latex')
-ylim([-0.15*180/pi,0.3*180/pi])
+scatter(-Goal_Phi(1:13),(Goal_Phi(1:13)-Base_angle(1:13)),60,[0 0.4470 0.7410],'filled') % Plot -ve Goal_Phi on x axis because in the report rotation opposite
+xlabel('$\psi_{B^\prime}^*$ (rad)','Interpreter','latex')
+xlim([-1.7,1.7])
+xticks(-pi:pi/4:pi)%xticks(-180:45:180)
+xticklabels({'$-\pi$','$-3\pi/4$','$-\pi/2$','$-\pi/4$','0','$\pi/4$','$\pi/2$','$3\pi/4$','$\pi$'})%xticklabels({'-180','-135','-90','-45','0','45','90','135','180'})
+ylabel('$\Delta \psi_{e,B^\prime}$ (rad)','Interpreter','latex')
+ylim([-0.15,0.3])
 grid on
 box on
 ax = gca;

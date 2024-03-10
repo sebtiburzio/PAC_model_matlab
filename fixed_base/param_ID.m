@@ -9,7 +9,7 @@ load('../object_parameters/orange_short_weighted.mat')
 
 %%
 % Load data
-data = readmatrix("data_in/0801-swing_data/orange_short_weighted_swing/theta_evolution.csv");
+data = readmatrix("data_in/0305-loop/200g/theta_evolution.csv");
 ts = data(:,1)';
 Theta0 = data(:,2)';
 Theta1 = data(:,3)';

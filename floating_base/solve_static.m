@@ -10,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/black_short_unweighted.mat')
+load('../object_parameters/full_dynamic_id/loop_empty_dyn.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -26,8 +26,8 @@ global goal
 % options = optimoptions('fmincon','EnableFeasibilityMode',true,'SubproblemAlgorithm','cg');
 
 % Constraints
-lb = [-Inf,-Inf, -1.2, 0.333, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
+lb = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 1.2, 1.2, 2*pi/4];
 global radial_constraint
 radial_constraint = 0.5; % Centered on Joint1
 
@@ -258,17 +258,37 @@ curv = [];
 path = [];
 results = [];
 endpts = [];
-lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+lb = [-Inf,-Inf, -2.0, 0, -pi]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 2.0, 2.0, pi];
 radial_constraint = 0.6; % Centered on Joint1
-goals = [0.025, 0.10, pi/2;
-         0.025, 0.15, pi/2;
-         0.025, 0.15, pi/4;
-         0.025, 0.15, 0;
-        -0.080, 0.15, 0;
-        -0.080, 0.15, -pi/4;
-        -0.080, 0.15, -pi/2]';
-q_0 = [1e-3;1e-3;0.0;0.8;0];
+offset_x = 0.1;
+offset_z = 0.055;
+% Upright hook
+% goal_set = [0.025, 0.10, pi/2, 5;   % last element is number of points to interpolate to next goal
+%             0.025, 0.15, pi/2, 15;
+%             0.025, 0.15, 0, 5;
+%             -0.080, 0.15, 0, 15;
+%             -0.080, 0.15, -pi/2, 0]';
+% RHS hook
+goal_set = [-0.1, 0.025, 0, 5;
+            -0.15, 0.025, 0, 15;
+            -0.15, 0.025, -pi/2, 5;
+            -0.15, -0.015, -pi/2, 0]';
+% LHS hook
+% goal_set = [0.1, 0.025, 0, 5;
+%             0.15, 0.025, 0, 15;
+%             0.15, 0.025, pi/2, 5;
+%             0.15, -0.08, pi/2, 15]';
+% Offset
+goal_set = goal_set+[offset_x, offset_z, 0 ,0]';
+
+goals = []
+for i = 1:length(goal_set)-1
+    steps = goal_set(4,i);
+    goals = [goals [linspace(goal_set(1,i),goal_set(1,i+1),steps);linspace(goal_set(2,i),goal_set(2,i+1),steps);linspace(goal_set(3,i),goal_set(3,i+1),steps)] ];
+end
+
+q_0 = [1e-3;1e-3;0.0;0.8;pi/2];
 for goal = goals
    
     [q_st,fval,exitflag] = fmincon(@fa,q_0,[],[],[],[],lb,ub,@nonlcon);
@@ -284,7 +304,13 @@ for goal = goals
 end
 
 % Plot hook
-plot([0, -0.08, -0.08, 0.025, 0.025], [0, 0, 0.15, 0.15, 0.11],LineWidth=2,Color=[0.5,0.5,0.5])
+% Upright
+% plot(offset_x+[0, -0.08, -0.08, 0.025, 0.025], offset_z+[0, 0, 0.15, 0.15, 0.11],LineWidth=2,Color=[0.5,0.5,0.5])
+% RHS
+plot(offset_x-[0, 0, 0.15, 0.15, 0.11], offset_z+[0, -0.08, -0.08, 0.025, 0.025],LineWidth=2,Color=[0.5,0.5,0.5])
+% LHS
+% plot(offset_x+[0, 0, 0.15, 0.15, 0.11], offset_z+[0, -0.08, -0.08, 0.025, 0.025],LineWidth=2,Color=[0.5,0.5,0.5])
+
 
 % Plot constraints
 hold on
@@ -384,7 +410,7 @@ end
 % Objective function - minimise endpoint goal distance inc orientation TODO - correct measure of orientation error
 function obj = fa(q)
     global p_vals goal
-    obj = norm(fka_fcn(p_vals, q, 1, 0) - goal);
+    obj = norm(diag([1e1 1e1 1e0])*(fka_fcn(p_vals, q, 1, 0) - goal));
 end
 
 % Constraints

@@ -10,7 +10,7 @@ global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/full_dynamic_id/loop_empty_dyn.mat')
+load('../object_parameters/black_short_loop_100g.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';
@@ -258,11 +258,11 @@ curv = [];
 path = [];
 results = [];
 endpts = [];
-lb = [-Inf,-Inf, -2.0, 0, -pi]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 2.0, 2.0, pi];
-radial_constraint = 0.6; % Centered on Joint1
-offset_x = 0.1;
-offset_z = 0.055;
+lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+radial_constraint = 0.65; % Centered on Joint1
+offset_x = 0.8;
+offset_z = 0.475;
 % Upright hook
 % goal_set = [0.025, 0.10, pi/2, 5;   % last element is number of points to interpolate to next goal
 %             0.025, 0.15, pi/2, 15;
@@ -270,10 +270,12 @@ offset_z = 0.055;
 %             -0.080, 0.15, 0, 15;
 %             -0.080, 0.15, -pi/2, 0]';
 % RHS hook
-goal_set = [-0.1, 0.025, 0, 5;
-            -0.15, 0.025, 0, 15;
-            -0.15, 0.025, -pi/2, 5;
-            -0.15, -0.015, -pi/2, 0]';
+goal_set = [-0.2, 0.13, 0, 5;
+            -0.08, 0.13, 0, 5;
+            -0.08, 0.025, 0, 5;
+            -0.15, 0.025, 0, 12;
+            -0.15, 0.025, -pi/4, 5]';
+            % -0.15, -0.015, -pi/4, 0]';
 % LHS hook
 % goal_set = [0.1, 0.025, 0, 5;
 %             0.15, 0.025, 0, 15;
@@ -299,7 +301,11 @@ for goal = goals
     curv = [curv, [q_st(1); q_st(2)]];
     endpt = fka_fcn(p_vals, q_st, 1, 0);
     endpts = [endpts, endpt];
-    plot_config(q_st,1);%zg/0.75+0.05)
+    % plot_config(q_st,0.19+length(results)*0.03);
+    % Swap to below to only plot certain range of solns
+    if length(results) >= 15 & length(results) <= 27
+        plot_config(q_st,1);
+    end
     hold on
 end
 
@@ -322,6 +328,20 @@ yunit = radial_constraint * sin(th) + 0.333;
 plot(xunit, yunit,'r');
 hold off
 
+xlim([0.25,0.85])
+xticks([0.3,0.4,0.5,0.6,0.7,0.8])
+ylim([0.35,0.95])
+xlabel('$x_B$ (m)','Interpreter','latex')
+ylabel('$y_B$ (m)','Interpreter','latex')
+ax = gca;
+set(ax, 'FontSize', 30)
+set(ax, 'TickLabelInterpreter', 'latex')
+lines = findobj(gcf, 'Type', 'line');
+for i = 1:length(lines)
+    set(lines(i), 'markersize', 10, 'linewidth', 2);
+end
+grid on
+box on
 %% Export the problem configuration and solutions
 writematrix([path', curv', goals', endpts'],'sequence.csv');
 % save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
@@ -335,10 +355,12 @@ ylim([-0.05,0.85])
 xlabel('$x_B$ (m)','Interpreter','latex')
 ylabel('$y_B$ (m)','Interpreter','latex')
 yticklabels('auto')
+xticks([-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7])
+yticks([0,0.2,0.4,0.6,0.8])
 ax = gca;
-set(ax, 'FontSize', 28)
+set(ax, 'FontSize', 40)
 set(ax, 'TickLabelInterpreter', 'latex')
-%exportgraphics(ax,'D:\Study\Thesis\Report\images\endpoint_sols\orange_weighted_phicost\35.eps')
+% exportgraphics(ax,'D:\Study\Thesis\Report\Rewrite\images\updated_figures\endpoint_sols\black_weighted\05.eps')
 
 %% Format solution figures for report - orientation
 xlim([-0.5,0.5])
@@ -410,7 +432,7 @@ end
 % Objective function - minimise endpoint goal distance inc orientation TODO - correct measure of orientation error
 function obj = fa(q)
     global p_vals goal
-    obj = norm(diag([1e1 1e1 1e0])*(fka_fcn(p_vals, q, 1, 0) - goal));
+    obj = norm(diag([1e2 1e2 1e0])*(fka_fcn(p_vals, q, 1, 0) - goal));
 end
 
 % Constraints

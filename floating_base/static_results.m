@@ -29,27 +29,16 @@ plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 % mean(endpt_error,'all')
 % median(endpt_error,'all')
 
-% Swap to commented lines for original plot including phi cost case (do not try to understand the madness that went into converting the vertical bar plot to horizontal)
-% load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+%% Error mean plot without phi cost case
+
 load('.\data_in\0829-static_wkspaceCD\endpt_error_means_without_phi_cost_case.mat')
-% ob_cats = categorical({'OB1','OB2','OB3','OB5'});
-% ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
 ob_cats = categorical({'OB5','OB3','OB2','OB1'});
 ob_cats = reordercats(ob_cats,{'OB5','OB3','OB2','OB1'});
-% b = bar(ob_cats,endpt_error_means);
-% b(1).FaceColor = [0.6350 0.0780 0.1840];
-% b(2).FaceColor = [0.8500 0.3250 0.0980];
-% b(3).FaceColor = [0.9290 0.6940 0.1250];
-% b(4).FaceColor = [0 0.262 0.5];
-% b(5).FaceColor = [0 0.4470 0.7410];
-% b(6).FaceColor = [0.3010 0.7450 0.9330];
-% b = barh(ob_cats,endpt_error_means_without_phi_cost_case);
 b = barh(flip(ob_cats,2),flip(endpt_error_means_without_phi_cost_case,2));
 b(1).FaceColor = [0.3010 0.7450 0.9330];
 b(2).FaceColor = [0 0.262 0.5];
 b(3).FaceColor = [0.9290 0.6940 0.1250];
 b(4).FaceColor = [0.6350 0.0780 0.1840];
-% ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
 xlabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
 ax = gca;
 set(ax, 'FontSize', 18)
@@ -57,28 +46,81 @@ set(ax, 'TickLabelInterpreter', 'latex')
 grid on
 box on
 
-% bar_labels=categorical({'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
-% bar_labels=reordercats(bar_labels,{'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
 bar_labels=categorical({'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
 bar_labels=reordercats(bar_labels,{'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
 hold on
-% bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
-% bh(2) = bar(nan,nan,'FaceColor',[0.8500 0.3250 0.0980]);
-% bh(3) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
-% bh(4) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
-% bh(5) = bar(nan,nan,'FaceColor',[0 0.4470 0.7410]);
-% bh(6) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
 bh(1) = barh(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
 bh(2) = barh(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
 bh(3) = barh(nan,nan,'FaceColor',[0 0.262 0.5]);
 bh(4) = barh(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
-% legend(bh, string(bar_labels),'Location','eastoutside')
 xlim([0,0.25])
 legend(bh, string(bar_labels),'Location','northoutside')
 l = findobj(gcf, 'Type', 'legend');
 set(l, 'Interpreter', 'latex')
-% set(gcf, 'Position', [303 495 1115 331])
 set(gcf, 'Position', [833 220 466 611])
+
+%% Error mean plot without phi cost case - horizontal orientation
+
+load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+ob_cats = categorical({'OB1','OB2','OB3','OB5'});
+ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
+b = bar(ob_cats,endpt_error_means(:,[1,2,4,5]));
+b(1).FaceColor = [0.6350 0.0780 0.1840];
+b(2).FaceColor = [0.9290 0.6940 0.1250];
+b(3).FaceColor = [0 0.262 0.5];
+b(4).FaceColor = [0.3010 0.7450 0.9330];
+ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
+ax = gca;
+set(ax, 'FontSize', 18)
+set(ax, 'TickLabelInterpreter', 'latex')
+grid on
+box on
+
+bar_labels=categorical({'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
+bar_labels=reordercats(bar_labels,{'Reference (modeled)','Using controller (modeled)','Reference (measured)','Using controller (measured)'});
+hold on
+bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
+bh(2) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
+bh(3) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
+bh(4) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
+legend(bh, string(bar_labels),'Location','eastoutside')
+l = findobj(gcf, 'Type', 'legend');
+set(l, 'Interpreter', 'latex')
+set(gcf, 'Position', [303 495 1115 331])
+
+%% Error mean plot with phi cost case
+
+load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+ob_cats = categorical({'OB1','OB2','OB3','OB5'});
+ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
+b = bar(ob_cats,endpt_error_means);
+b(1).FaceColor = [0.6350 0.0780 0.1840];
+b(2).FaceColor = [0.8500 0.3250 0.0980];
+b(3).FaceColor = [0.9290 0.6940 0.1250];
+b(4).FaceColor = [0 0.262 0.5];
+% b(5).FaceColor = [0 0.4470 0.7410];
+% b(6).FaceColor = [0.3010 0.7450 0.9330];
+ylabel('Mean $\Delta p_e (m)$', 'Interpreter','latex')
+ax = gca;
+set(ax, 'FontSize', 18)
+set(ax, 'TickLabelInterpreter', 'latex')
+grid on
+box on
+
+bar_labels=categorical({'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+bar_labels=reordercats(bar_labels,{'Reference (model)','No $\phi$ cost (model)','With $\phi$ cost (model)','Reference (meas.)','No $\phi$ cost (meas.)','With $\phi$ cost(meas.)'});
+hold on
+bh(1) = bar(nan,nan,'FaceColor',[0.6350 0.0780 0.1840]);
+bh(2) = bar(nan,nan,'FaceColor',[0.8500 0.3250 0.0980]);
+bh(3) = bar(nan,nan,'FaceColor',[0.9290 0.6940 0.1250]);
+bh(4) = bar(nan,nan,'FaceColor',[0 0.262 0.5]);
+bh(5) = bar(nan,nan,'FaceColor',[0 0.4470 0.7410]);
+bh(6) = bar(nan,nan,'FaceColor',[0.3010 0.7450 0.9330]);
+legend(bh, string(bar_labels),'Location','eastoutside')
+l = findobj(gcf, 'Type', 'legend');
+set(l, 'Interpreter', 'latex')
+set(gcf, 'Position', [303 495 1115 331])
+
 
 %% Heatmap plots
 topplt = 3; % Model comparison, control/nophicost/phicost, 1/2/3

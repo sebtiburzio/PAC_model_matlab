@@ -5,11 +5,11 @@ addpath('automatically_generated')
 
 %%
 % Load predefined object parameters
-load('../object_parameters/black_weighted.mat')
+load('../object_parameters/full_dynamic_id/black_short_loop_100g.mat')
 
 %%
 % Load data
-data = readmatrix("data_in/0802/black_weighted_equilibria/theta_equilibria.csv");
+data = readmatrix("data_in/0402-loop_static_id/100g/theta_equilibria.csv"); % TODO - make this import as column vectors with inherited names
 range = [1,length(Gamma)];
 num_samples = range(2) - range(1) + 1;
 Gamma_set = -Gamma(range(1):range(2)); % Note - use -ve Gamma since data is robot angle
@@ -38,6 +38,11 @@ Pi = pinv(Y)*delta;
 k_id = Pi(1)
 theta_bar_0_id = Pi(2)/k_id
 theta_bar_1_id = Pi(3)/k_id
+
+%% Save parameters
+k_obj = k_id;
+Theta_bar = [theta_bar_0_id; theta_bar_1_id];
+save('black_short_loop_100g_static', 'p_vals', 'k_obj', 'Theta_bar')
 
 %%
 % % Theta_bar from static eqns with variable gravity field and prescribed K

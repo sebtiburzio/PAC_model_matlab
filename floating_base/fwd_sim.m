@@ -6,8 +6,7 @@ addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
 global beta_obj D
 
-%%
-% Load predefined object parameters
+%% Load predefined object parameters
 load('../object_parameters/black_unweighted.mat')
 % load('../object_parameters/full_dynamic_id/black_weighted_dyn.mat')
 
@@ -22,8 +21,8 @@ load('../object_parameters/black_unweighted.mat')
 % beta_obj = 0.0547;
 
 %%
-k_base = diag([0 1e3 0]);
-beta_base = diag([1e-2 1e-2 1e-2]);
+k_base = diag([0 1e4 0]);
+beta_base = diag([1e-1 1e-1 1e-1]);
 Theta_bar = [Theta_bar(1); Theta_bar(2); 0; 0; 0];
 H = [1, 1/2; 1/2, 1/3];
 K = [k_obj*H     zeros(2,3);
@@ -41,9 +40,25 @@ dx_0 = [0; 0; 0; 0; 0];
 
 %% For comparing to imported measured dynamic evolution
 % Import the full state and input data csv as column vectors first
+state_ev_data = readtable('./data_in/0913-dyn_evs/black_unweighted/state_and_input.csv')
+ts = state_ev_data.ts;
+Theta0 = state_ev_data.Theta0;
+Theta1 = state_ev_data.Theta1;
+dTheta0 = state_ev_data.dTheta0;
+dTheta1 = state_ev_data.dTheta1;
+X = state_ev_data.X;
+Z = state_ev_data.Z;
+Phi = state_ev_data.Phi;
+dX = state_ev_data.dX;
+dZ = state_ev_data.dZ;
+dPhi = state_ev_data.dPhi;
+Fx = state_ev_data.Fx; 
+Fz = state_ev_data.Fz;
+Ty = state_ev_data.Ty;
 % Measured data is force/torque reading. Actuation is negative of this
 % Also additional moment due to offset from FT sensor and cable base (only set manually for Phi=0 case for now. 0.0485m is the offset for the black cables)
 actuation = [ts -Fx -Fz -Ty-Fx*0.0485]; % Simulink model reads this matrix (when connected as input)
+
 x_0 = [Theta0(1);Theta1(1);X(1);Z(1);Phi(1)];
 dx_0 = [dTheta0(1);dTheta1(1);dX(1);dZ(1);dPhi(1)];
 mdl = 'dynamics';

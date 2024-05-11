@@ -6,8 +6,7 @@ addpath('automatically_generated')
 global k_obj K p_vals Theta_bar
 global beta_obj D
 
-%%
-% Load predefined object parameters
+%% Load predefined object parameters
 load('../object_parameters/black_weighted.mat')
 % load('../object_parameters/full_dynamic_id/orange_weighted_dyn.mat')
 
@@ -36,6 +35,13 @@ dx_0 = [0; 0];
 
 %% For comparing to imported measured dynamic evolution
 % Import the full theta state data csv as column vectors first
+theta_ev_data = readtable('./data_in/0801-swing_data/black_weighted_swing/theta_evolution.csv');
+ts = theta_ev_data.ts;
+Theta0 = theta_ev_data.Theta0;
+Theta1 = theta_ev_data.Theta1;
+dTheta0 = theta_ev_data.dTheta0;
+dTheta1 = theta_ev_data.dTheta1;
+
 x_0 = [Theta0(1);Theta1(1)];
 dx_0 = [dTheta0(1);dTheta1(1)];
 mdl = 'dynamics';
@@ -78,6 +84,15 @@ writematrix(data,'black_weighted_swing_sim.csv');
 
 %% Plot steady state comparison - floating base frame
 % Import the steady state measurements data csv as column vectors first
+theta_eq_data = readtable('./data_in/0802-equilibrium_data/black_weighted_equilibria/theta_equilibria.csv');
+Gamma  = theta_eq_data.Gamma;
+Theta0 = theta_eq_data.Theta0;
+Theta1 = theta_eq_data.Theta1;
+X_mid = theta_eq_data.X_mid;
+X_end = theta_eq_data.X_end;
+Z_mid = theta_eq_data.Z_mid;
+Z_end = theta_eq_data.Z_end;
+
 [~, ss_range] = min(abs(Gamma-[3*pi/4 pi/2 pi/4 0 -pi/4 -pi/2 -3*pi/4])); % Select indexes in Gamma closest to desired plot angles
 % [~, ss_range] = min(abs(Gamma-(4:4)*pi/12));
 for i = ss_range

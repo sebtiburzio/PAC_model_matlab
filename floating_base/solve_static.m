@@ -29,7 +29,7 @@ global goal
 lb = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 2*pi/4];
 global radial_constraint
-radial_constraint = 0.5; % Centered on Joint1
+radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
 
 %%
 % SOLVERS
@@ -99,7 +99,7 @@ results = [];
 endpts = [];
 lb = [-Inf,-Inf, -1.2, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 1.2, 1.2, 3*pi/4];
-radial_constraint = 0.5; % Centered on Joint1
+radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
 xg_start = -0.7;
 xg_spacing = 0.1;
 xg_end = 0.7;
@@ -162,7 +162,7 @@ results = [];
 endpts=[];
 lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
-radial_constraint = 2.0; % Centered on Joint1
+radial_constraint = 2.0; % Centered on Joint1 of FR3 (x=0, z=0.333)
 for phig = -pi/2:pi/12:3*pi/4
     goal = [0.0; 0.45; phig];
     goals = [goals, goal];
@@ -213,7 +213,7 @@ results = [];
 endpts = [];
 lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
-radial_constraint = 0.5; % Centered on Joint1
+radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
 for xg = [-0.2, 0, 0.2]
     goal = [xg; 0.15; 0];
     goals = [goals, goal];
@@ -260,28 +260,29 @@ results = [];
 endpts = [];
 lb = [-Inf,-Inf, -2.0, 0, -3*pi/4]; % Theta0, Theta1, X, Z, Phi
 ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
-radial_constraint = 0.65; % Centered on Joint1
-offset_x = 0.8;
-offset_z = 0.475;
-% Upright hook
-% goal_set = [0.025, 0.10, pi/2, 5;   % last element is number of points to interpolate to next goal
-%             0.025, 0.15, pi/2, 15;
-%             0.025, 0.15, 0, 5;
-%             -0.080, 0.15, 0, 15;
-%             -0.080, 0.15, -pi/2, 0]';
+radial_constraint = 0.65; % Centered on Joint1 of FR3 (x=0, z=0.333)
+
 % RHS hook
-goal_set = [-0.2, 0.13, 0, 5;
+goal_set = [-0.2, 0.13, 0, 5;   % last element is number of points to interpolate to next goal
             -0.08, 0.13, 0, 5;
             -0.08, 0.025, 0, 5;
             -0.15, 0.025, 0, 12;
             -0.15, 0.025, -pi/4, 5]';
-            % -0.15, -0.015, -pi/4, 0]';
+% Upright hook
+% goal_set = [0.025, 0.10, pi/2, 5;   
+%             0.025, 0.15, pi/2, 15;
+%             0.025, 0.15, 0, 5;
+%             -0.080, 0.15, 0, 15;
+%             -0.080, 0.15, -pi/2, 0]';            
 % LHS hook
 % goal_set = [0.1, 0.025, 0, 5;
 %             0.15, 0.025, 0, 15;
 %             0.15, 0.025, pi/2, 5;
 %             0.15, -0.08, pi/2, 15]';
-% Offset
+
+% Offset hook
+offset_x = 0.8;
+offset_z = 0.475;
 goal_set = goal_set+[offset_x, offset_z, 0 ,0]';
 
 goals = []
@@ -301,22 +302,21 @@ for goal = goals
     curv = [curv, [q_st(1); q_st(2)]];
     endpt = fka_fcn(p_vals, q_st, 1, 0);
     endpts = [endpts, endpt];
-    % plot_config(q_st,0.19+length(results)*0.03);
+    plot_config(q_st,0.19+length(results)*0.03);
     % Swap to below to only plot certain range of solns
-    if length(results) >= 15 & length(results) <= 27
-        plot_config(q_st,1);
-    end
+    % if length(results) >= 15 & length(results) <= 27
+    %     plot_config(q_st,1);
+    % end
     hold on
 end
 
 % Plot hook
-% Upright
-% plot(offset_x+[0, -0.08, -0.08, 0.025, 0.025], offset_z+[0, 0, 0.15, 0.15, 0.11],LineWidth=2,Color=[0.5,0.5,0.5])
 % RHS
 plot(offset_x-[0, 0, 0.15, 0.15, 0.11], offset_z+[0, -0.08, -0.08, 0.025, 0.025],LineWidth=2,Color=[0.5,0.5,0.5])
+% Upright
+% plot(offset_x+[0, -0.08, -0.08, 0.025, 0.025], offset_z+[0, 0, 0.15, 0.15, 0.11],LineWidth=2,Color=[0.5,0.5,0.5])
 % LHS
 % plot(offset_x+[0, 0, 0.15, 0.15, 0.11], offset_z+[0, -0.08, -0.08, 0.025, 0.025],LineWidth=2,Color=[0.5,0.5,0.5])
-
 
 % Plot constraints
 hold on
@@ -345,6 +345,7 @@ box on
 %% Export the problem configuration and solutions
 writematrix([path', curv', goals', endpts'],'sequence.csv');
 % save('full_range_centered','p_vals','Pi', 'goals', 'results', 'path', 'curv', 'lb', 'ub', 'radial_constraint');
+
 %% 
 % PLOTTING
 

@@ -1,13 +1,13 @@
 %%
 clear
 clear global
-rmpath('../fixed_base/automatically_generated')
-addpath('automatically_generated')
+rmpath('../../fixed_base/automatically_generated')
+addpath('./automatically_generated')
 global k_obj K p_vals Theta_bar
 
 %% Object properties
 % Load predefined object parameters
-load('../object_parameters/black_short_weighted.mat')
+load('../../object_parameters/black_short_weighted.mat')
 
 % % Manually defined object parameters (overwrites loaded parameters)
 % p_vals = [0.6, 0.23, 0.6, 0.02]';

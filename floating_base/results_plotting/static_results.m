@@ -1,8 +1,8 @@
 %%
 clear
 clear global
-rmpath('../fixed_base/automatically_generated')
-addpath('automatically_generated')
+rmpath('../../fixed_base/automatically_generated')
+addpath('../automatically_generated')
 
 %%
 t = tiledlayout(2,3,'TileSpacing','Tight');
@@ -31,7 +31,7 @@ plot_clr = [1 1 1]; % Colour for lines between goal/modelled and measured points
 
 %% Error mean plot without phi cost case
 
-load('.\data_in\0829-static_wkspaceCD\endpt_error_means_without_phi_cost_case.mat')
+load('..\data_in\0829-static_wkspaceCD\endpt_error_means_without_phi_cost_case.mat')
 ob_cats = categorical({'OB5','OB3','OB2','OB1'});
 ob_cats = reordercats(ob_cats,{'OB5','OB3','OB2','OB1'});
 b = barh(flip(ob_cats,2),flip(endpt_error_means_without_phi_cost_case,2));
@@ -61,7 +61,7 @@ set(gcf, 'Position', [833 220 466 611])
 
 %% Error mean plot without phi cost case - horizontal orientation
 
-load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+load('..\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
 ob_cats = categorical({'OB1','OB2','OB3','OB5'});
 ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
 b = bar(ob_cats,endpt_error_means(:,[1,2,4,5]));
@@ -90,7 +90,7 @@ set(gcf, 'Position', [303 495 1115 331])
 
 %% Error mean plot with phi cost case
 
-load('.\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
+load('..\data_in\0829-static_wkspaceCD\endpt_error_means.mat')
 ob_cats = categorical({'OB1','OB2','OB3','OB5'});
 ob_cats = reordercats(ob_cats,{'OB1','OB2','OB3','OB5'});
 b = bar(ob_cats,endpt_error_means);

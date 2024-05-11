@@ -2,10 +2,10 @@
 clear
 clear global
 
-load('../object_parameters/full_dynamic_id/black_short_loop_100g.mat')
-state_evolution = readtable("./data_in/0402-loop_demo_static_id/650_0/state_evolution.csv");
-measurements = readtable("./data_in/0402-loop_demo_static_id/650_0/measurements.csv");
-sequence = readtable("./data_in/0402-loop_demo_static_id/650_0/sequence.csv");
+load('../../object_parameters/full_dynamic_id/black_short_loop_100g.mat')
+state_evolution = readtable("../data_in/0402-loop_demo_static_id/650_0/state_evolution.csv");
+measurements = readtable("../data_in/0402-loop_demo_static_id/650_0/measurements.csv");
+sequence = readtable("../data_in/0402-loop_demo_static_id/650_0/sequence.csv");
 
 %% Base Plot with line references
 yyaxis left

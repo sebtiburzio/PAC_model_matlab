@@ -1,6 +1,6 @@
 # PAC_model_matlab
 
-This repository contains Matlab code relating to my MSc Robotics [thesis](https://repository.tudelft.nl/islandora/object/uuid%3A7f543ce2-b7a5-456c-ab7b-81171c353de2?collection=education) on manipulation of deformable linear objects using Affine Curvature modelling.[^1]
+This repository contains Matlab code relating to my MSc Robotics [thesis](https://repository.tudelft.nl/islandora/object/uuid%3A7f543ce2-b7a5-456c-ab7b-81171c353de2?collection=education) on manipulation of deformable linear objects using Affine Curvature modelling, subsequently developed into [this paper](https://arxiv.org/abs/2402.16114).
 
 See [here](https://github.com/sebtiburzio/floating_PAC_model) for the code dealing with processing the data recorded in the experiments as well as a less developed Python implementation of the model using Sympy.
 
@@ -56,6 +56,4 @@ Examples of setting up nonlinear optimisation problems to generate manipulator s
 https://github.com/sebtiburzio/PAC_model_matlab/assets/95340175/9968affd-c4e2-4f4b-82fa-2cf3014d43c5
 
 ## Object Properties
-The object properties determined through the parameter identification experiments are saved in the `object_parameters` directory, and should be loaded in the script initialisation. There are two sets: those in the main directory were determined with the 2 stage process (k and theta_bar from static data, then beta from dynamic data), while those in the sub directory `full_dynamic_id` were determined from dynamic data only.
-
-[^1]: *!!! CORRIGENDUM D: !!!* Eqn (5) defines G as J^T multipying the integrals; actually the Jacobian operator should be applied to the integrals
+The object properties determined through the parameter identification experiments are saved in the `object_parameters` directory, and should be loaded in the script initialisation. There are two sets: those in the main directory were determined with the 2 stage process (k and theta_bar from static data, then beta from dynamic data), while those in the sub directory `full_dynamic_id` were determined from dynamic data only

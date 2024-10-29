@@ -1,4 +1,4 @@
-%%
+c%%
 clear
 clear global
 rmpath('../fixed_base/automatically_generated')

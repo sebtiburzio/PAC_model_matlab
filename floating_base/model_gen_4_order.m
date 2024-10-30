@@ -42,26 +42,26 @@ fka_fcn = [fk_fcn; phi + subs(alpha,v,s)];
 toc
 
 % Export FK function
-matlabFunction(fk_fcn,'File','automatically_generated/poly_order_4/fk_fcn','Vars',{p, q, s, d}); % creating the MatLab function
+matlabFunction(fk_fcn,'File','automatically_generated/poly_order_4/fk_fcn_order_4','Vars',{p, q, s, d}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/fk_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/fk_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/fk_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/fk_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
 % With orientation
-matlabFunction(fka_fcn,'File','automatically_generated/poly_order_4/fka_fcn','Vars',{p, q, s, d}); % creating the MatLab function
+matlabFunction(fka_fcn,'File','automatically_generated/poly_order_4/fka_fcn_order_4','Vars',{p, q, s, d}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/fka_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/fka_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/fka_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/fka_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -82,25 +82,25 @@ Gv_fcn = jacobian(9.81*(U),[theta_0; theta_1; theta_2; theta_3; theta_4; x; z; p
 
 toc
 
-matlabFunction(G_fcn,'File','automatically_generated/poly_order_4/G_fcn','Vars',{p, q}); % creating the MatLab function
+matlabFunction(G_fcn,'File','automatically_generated/poly_order_4/G_fcn_order_4','Vars',{p, q}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/G_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/G_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/G_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/G_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
-matlabFunction(Gv_fcn,'File','automatically_generated/poly_order_4/Gv_fcn','Vars',{p, q, gamma}); % creating the MatLab function
+matlabFunction(Gv_fcn,'File','automatically_generated/poly_order_4/Gv_fcn_order_4','Vars',{p, q, gamma}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/Gv_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/Gv_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/Gv_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/Gv_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -119,14 +119,14 @@ end
 
 toc
 
-matlabFunction(B_fcn,'File','automatically_generated/poly_order_4/B_fcn','Vars',{p, q}); % creating the MatLab function
+matlabFunction(B_fcn,'File','automatically_generated/poly_order_4/B_fcn_order_4','Vars',{p, q}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/B_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/B_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/B_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/B_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -147,13 +147,13 @@ end
 
 toc
 
-matlabFunction(C_fcn,'File','automatically_generated/poly_order_4/C_fcn','Vars',{p, q, dq}); % creating the MatLab function
+matlabFunction(C_fcn,'File','automatically_generated/poly_order_4/C_fcn_order_4','Vars',{p, q, dq}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_4/C_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_4/C_fcn_order_4.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_4/C_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_4/C_fcn_order_4.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);

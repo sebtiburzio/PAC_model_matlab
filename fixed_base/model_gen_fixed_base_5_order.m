@@ -9,10 +9,10 @@ num_masses = 6;  % Number of masses to discretise along length (not including en
 syms gamma % Gravity direction
 
 % Configuration variables
-syms theta_0 theta_1 dtheta_0 dtheta_1 ddtheta_0 ddtheta_1
-theta = [theta_0;theta_1];
-dtheta = [dtheta_0;dtheta_1];
-ddtheta = [ddtheta_0;ddtheta_1];
+syms theta_0 theta_1  theta_2 theta_3 theta_4 theta_5 dtheta_0 dtheta_1 dtheta_2 dtheta_3 dtheta_4 dtheta_5 ddtheta_0 ddtheta_1 ddtheta_2 ddtheta_3 ddtheta_4 ddtheta_5
+theta = [theta_0;theta_1;theta_2;theta_3;theta_4;theta_5];
+dtheta = [dtheta_0;dtheta_1;dtheta_2;dtheta_3;dtheta_4;dtheta_5];
+ddtheta = [ddtheta_0;ddtheta_1;ddtheta_2;ddtheta_3;ddtheta_4;ddtheta_5];
 
 % Object coordinates in global frame (forward kinematics)
 fk_fcn = sym(zeros(2,1));
@@ -26,7 +26,7 @@ syms s v d real
 tic
 
 % Spine x,z in object base frame, defined as if it was reflected in the robot XY plane
-alpha = theta_0*v + 0.5*theta_1*v^2;
+alpha = theta_0*v + 0.5*theta_1*v^2 + 1/3*theta_2*v^3 + 1/4*theta_3*v^4 + 1/5*theta_4*v^5 + 1/6*theta_5*v^6;
 fk_fcn(1) = -L*int(sin(alpha),v, 0, s); % x. when theta=0, x=0.
 fk_fcn(2) = -L*int(cos(alpha),v, 0, s); % z. when theta=0, z=-L. 
 
@@ -37,14 +37,14 @@ fk_fcn = fk_fcn + D*rot_alpha*[d; 0];
 toc
 
 % Export FK function
-matlabFunction(fk_fcn,'File','automatically_generated/poly_order_1/fk_fcn','Vars',{p, theta, s, d}); % creating the MatLab function
+matlabFunction(fk_fcn,'File','automatically_generated/poly_order_5/fk_fcn','Vars',{p, theta, s, d}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_1/fk_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_5/fk_fcn.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_1/fk_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_5/fk_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -59,30 +59,30 @@ for i = 0:num_masses-1
 end
 
 % Potential force
-G_fcn = jacobian(9.81*(subs(U,gamma,0)),[theta_0; theta_1])'; % Gravity field Z direction
-Gv_fcn = jacobian(9.81*(U),[theta_0; theta_1])'; % Variable gravity field
+G_fcn = jacobian(9.81*(subs(U,gamma,0)),[theta_0; theta_1; theta_2; theta_3; theta_4; theta_5])'; % Gravity field Z direction
+Gv_fcn = jacobian(9.81*(U),[theta_0; theta_1; theta_2; theta_3; theta_4; theta_5])'; % Variable gravity field
 
 toc
 
-matlabFunction(G_fcn,'File','automatically_generated/poly_order_1/G_fcn','Vars',{p, theta}); % creating the MatLab function
+matlabFunction(G_fcn,'File','automatically_generated/poly_order_5/G_fcn','Vars',{p, theta}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_1/G_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_5/G_fcn.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_1/G_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_5/G_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
-matlabFunction(Gv_fcn,'File','automatically_generated/poly_order_1/Gv_fcn','Vars',{p, theta, gamma}); % creating the MatLab function
+matlabFunction(Gv_fcn,'File','automatically_generated/poly_order_5/Gv_fcn','Vars',{p, theta, gamma}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_1/Gv_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_5/Gv_fcn.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_1/Gv_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_5/Gv_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -90,23 +90,23 @@ fclose(fid);
 % Inertia matrix
 tic
 
-J = jacobian(subs(fk_fcn,s, 1),[theta_0; theta_1]);
+J = jacobian(subs(fk_fcn,s, 1),[theta_0; theta_1; theta_2; theta_3; theta_4; theta_5]);
 B_fcn = m_E*int(J'*J, d, -1/2, 1/2);
 for i = 0:num_masses-1
-    J = jacobian(subs(fk_fcn, s, i/num_masses + 1/(num_masses*2)),[theta_0; theta_1]);
+    J = jacobian(subs(fk_fcn, s, i/num_masses + 1/(num_masses*2)),[theta_0; theta_1; theta_2; theta_3; theta_4; theta_5]);
     B_fcn = B_fcn + (m_L/num_masses)*int(J'*J, d, -1/2, 1/2);
 end
 
 toc
 
-matlabFunction(B_fcn,'File','automatically_generated/poly_order_1/B_fcn','Vars',{p, theta}); % creating the MatLab function
+matlabFunction(B_fcn,'File','automatically_generated/poly_order_5/B_fcn','Vars',{p, theta}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_1/B_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_5/B_fcn.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_1/B_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_5/B_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 
@@ -128,14 +128,14 @@ end
 
 toc
 
-matlabFunction(C_fcn,'File','automatically_generated/poly_order_1/C_fcn','Vars',{p,theta,dtheta}); % creating the MatLab function
+matlabFunction(C_fcn,'File','automatically_generated/poly_order_5/C_fcn','Vars',{p,theta,dtheta}); % creating the MatLab function
 
-fid  = fopen('automatically_generated/poly_order_1/C_fcn.m','r');
+fid  = fopen('automatically_generated/poly_order_5/C_fcn.m','r');
 f=fread(fid,'*char')';
 fclose(fid);
 f = strrep(f,'fresnelc','fresnelc_approx');
 f = strrep(f,'fresnels','fresnels_approx');
-fid  = fopen('automatically_generated/poly_order_1/C_fcn.m','w');
+fid  = fopen('automatically_generated/poly_order_5/C_fcn.m','w');
 fprintf(fid,'%s',f);
 fclose(fid);
 

@@ -10,13 +10,14 @@ addpath('automatically_generated/poly_order_4/')
 addpath('automatically_generated/poly_order_5/')
 
 % global k_obj K p_vals Theta_bar
-global k_obj_order_0 K_order_0 p_vals_order_0 Theta_bar_order_0
-global k_obj_order_1 K_order_1 p_vals_order_1 Theta_bar_order_1
-global k_obj_order_2 K_order_2 p_vals_order_2 Theta_bar_order_2
-global k_obj_order_3 K_order_3 p_vals_order_3 Theta_bar_order_3
-global k_obj_order_4 K_order_4 p_vals_order_4 Theta_bar_order_4
-global k_obj_order_5 K_order_5 p_vals_order_5 Theta_bar_order_5
+global k_obj_order_0 K_order_0 Theta_bar_order_0
+global k_obj_order_1 K_order_1 Theta_bar_order_1
+global k_obj_order_2 K_order_2 Theta_bar_order_2
+global k_obj_order_3 K_order_3 Theta_bar_order_3
+global k_obj_order_4 K_order_4 Theta_bar_order_4
+global k_obj_order_5 K_order_5 Theta_bar_order_5
 
+global p_vals
 %%
 % SETUP
 
@@ -38,27 +39,27 @@ global goal
 % options = optimoptions('fmincon','EnableFeasibilityMode',true,'SubproblemAlgorithm','cg');
 
 % Constraints
-lb_order_0 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_0 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-lb_order_1 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_1 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-lb_order_2 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_2 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-lb_order_3 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_3 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-lb_order_4 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_4 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-lb_order_5 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub_order_5 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
-
-global radial_constraint
-radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
-
+% lb_order_0 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_0 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% lb_order_1 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_1 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% lb_order_2 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_2 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% lb_order_3 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_3 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% lb_order_4 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_4 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% lb_order_5 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub_order_5 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+%
+% global radial_constraint
+% radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
+%
 %%
 % SOLVERS
 
@@ -188,8 +189,33 @@ curv = [];
 path = [];
 results = [];
 endpts=[];
-lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
-ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+
+% lb = [-Inf,-Inf, -2.0, 0, -4*pi/4]; % Theta0, Theta1, X, Z, Phi
+% ub = [Inf, Inf, 2.0, 2.0, 3*pi/4];
+
+% Constraints
+lb_order_0 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_0 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+lb_order_1 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_1 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+lb_order_2 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_2 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+lb_order_3 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_3 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+lb_order_4 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_4 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+lb_order_5 = [-Inf,-Inf, -1.2, 0.333, -2*pi/4]; % Theta0, Theta1, X, Z, Phi
+ub_order_5 = [Inf, Inf, 1.2, 1.2, 2*pi/4];
+
+global radial_constraint
+radial_constraint = 0.5; % Centered on Joint1 of FR3 (x=0, z=0.333)
+
+
 radial_constraint = 2.0; % Centered on Joint1 of FR3 (x=0, z=0.333)
 for phig = -pi/2:pi/12:3*pi/4
     goal = [0.0; 0.45; phig];

@@ -32,20 +32,25 @@ global p_vals
             hold on
             plot(xy_c(:,1),xy_c(:,2), Color=[1.0 0.5 0.0], LineWidth=3)
             hold off
-            title(time_vect(i_t))
+            title([num2str(time_vect(i_t), 2), ' s'])
         end
 
-        xlim([xy_c(1,1)-(p_vals(3)+0.1),xy_c(1,1)+(p_vals(3)+0.1)])
-        ylim([xy_c(1,2)-(p_vals(3)+0.1),xy_c(1,2)+0.1])
-%         xlim([-0.6,0.6])
-%         ylim([-0.8,0.2])
-        axis equal
+        % xlim([xy_c(1,1)-(p_vals(3)+0.1),xy_c(1,1)+(p_vals(3)+0.1)])
+        % ylim([xy_c(1,2)-(p_vals(3)+0.1),xy_c(1,2)+0.1])
+        xlim([-0.4,0.4])
+        ylim([-0.7,0.1])
+        ylabel('y (m)','Interpreter','latex')
+        xlabel('x (m)','Interpreter','latex')
+        ax = gca;
+        set(ax, 'FontSize', 10)
+        set(ax, 'TickLabelInterpreter', 'latex')
+        % axis equal
         grid on
 
         drawnow
         % Export frames for animation
-        % ax = gca;
-        % exportgraphics(ax,'./frames/' + string(i_t) + '.png','Resolution',300)
+        ax = gca;
+        exportgraphics(ax,'./results_plotting/frames/' + string(i_t) + '.png','Resolution',300)
         pause(0.01) % TODO - use rateControl to plot in real time rate?
 
     end
